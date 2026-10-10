@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three/three.module.js';
 import {defaults,validate,frame,messages,active} from './scenario.mjs';
 const $=id=>document.getElementById(id);
-let config={...defaults},time=0,playing=false,lastTick=null,lang='vi',views=[];
+let config={...defaults},time=0,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1;
 const tr=(vi,en)=>lang==='vi'?vi:en;
 const point=p=>p?`(${p.x.toFixed(2)}, ${p.y.toFixed(2)}) m`:'—';
 function text(id,value){$(id).textContent=value;}
@@ -20,9 +20,23 @@ $('reset').onclick=()=>{time=0;playing=false;draw();};
 $('time').oninput=e=>{time=Number(e.target.value);playing=false;draw();};
 $('language').onchange=e=>{lang=e.target.value;document.documentElement.lang=lang;translate();text('notice','');draw();};
 function translate(){for(const el of document.querySelectorAll('[data-vi]'))el.textContent=el.dataset[lang];}
+function setZoom(value){viewZoom=Math.max(0.75,Math.min(4,value));text('zoom-value',`${viewZoom.toFixed(1)}×`);draw();}
+$('zoom-in').onclick=()=>setZoom(viewZoom+0.25);
+$('zoom-out').onclick=()=>setZoom(viewZoom-0.25);
+$('fit-view').onclick=()=>setZoom(1);
+for(const button of document.querySelectorAll('.expand-view'))button.onclick=()=>{
+ const card=button.closest('article'),expand=!card.classList.contains('expanded');
+ for(const other of document.querySelectorAll('.expand-view')){
+  const selected=other===button&&expand;
+  other.closest('article').classList.toggle('expanded',selected);
+  other.setAttribute('aria-expanded',String(selected));
+  other.dataset.vi=selected?'Thu gọn khung':'Mở rộng khung';other.dataset.en=selected?'Collapse view':'Expand view';
+ }
+ translate();
+};
 function createView(id,color){
  const target=$(id),scene=new THREE.Scene();scene.background=new THREE.Color('#0d1827');
- const camera=new THREE.PerspectiveCamera(43,1,0.1,400);camera.position.set(42,68,60);camera.lookAt(0,0,0);
+ const camera=new THREE.OrthographicCamera(-30,30,30,-30,0.1,500);let aspect=1;
  const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));target.appendChild(renderer.domElement);
  scene.add(new THREE.HemisphereLight(0xffffff,0x233448,3));
  const grid=new THREE.GridHelper(100,20,0x334b60,0x203245);scene.add(grid);
@@ -30,8 +44,18 @@ function createView(id,color){
  for(const [x,z] of [[100,7],[7,100]]){const road=new THREE.Mesh(new THREE.PlaneGeometry(x,z),roadMaterial);road.rotation.x=-Math.PI/2;road.position.y=.02;scene.add(road);}
  function box(c,wire=false){const mesh=new THREE.Mesh(new THREE.BoxGeometry(4,1.8,2.2),new THREE.MeshStandardMaterial({color:c,wireframe:wire}));mesh.position.y=1.1;scene.add(mesh);return mesh;}
  const main=box(color),observer=box(0x7eafff),reference=box(0x67e8c3,true);observer.rotation.y=Math.PI/2;
- function resize(){const {width,height}=target.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();render(frame(config,time));}
- function render(f){const p=id==='truth'?f.physical:id==='reported'?f.claimed:f.last?.claimed;main.visible=Boolean(p);if(p)main.position.set(p.x,1.1,p.y);reference.visible=id!=='truth';reference.position.set(f.physical.x,1.1,f.physical.y);observer.position.set(f.receiver.x,1.1,f.receiver.y);renderer.render(scene,camera);}
+ function resize(){const {width,height}=target.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);aspect=width/height;render(frame(config,time));}
+ function render(f){
+ // All perspectives use the same positions to frame the scene for comparison.
+ const points=[f.physical,f.claimed,f.receiver,...(f.last?[f.last.claimed]:[])];
+ const xs=points.map(p=>p.x),zs=points.map(p=>p.y);
+ const cx=(Math.min(...xs)+Math.max(...xs))/2,cz=(Math.min(...zs)+Math.max(...zs))/2;
+ camera.position.set(cx+42,68,cz+60);camera.lookAt(cx,0,cz);camera.updateMatrixWorld();
+ let halfX=0,halfY=0;
+ for(const p of points){const v=new THREE.Vector3(p.x,1.1,p.y).applyMatrix4(camera.matrixWorldInverse);halfX=Math.max(halfX,Math.abs(v.x)+5);halfY=Math.max(halfY,Math.abs(v.y)+5);}
+ const half=Math.max(13,halfY,halfX/aspect)/viewZoom;
+ camera.left=-half*aspect;camera.right=half*aspect;camera.top=half;camera.bottom=-half;camera.updateProjectionMatrix();
+ const p=id==='truth'?f.physical:id==='reported'?f.claimed:f.last?.claimed;main.visible=Boolean(p);if(p)main.position.set(p.x,1.1,p.y);reference.visible=id!=='truth';reference.position.set(f.physical.x,1.1,f.physical.y);observer.position.set(f.receiver.x,1.1,f.receiver.y);renderer.render(scene,camera);}
  new ResizeObserver(resize).observe(target);resize();return render;
 }
 function draw(){
