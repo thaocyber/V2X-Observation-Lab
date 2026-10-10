@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three/three.module.js';
 import {defaults,validate,frame,messages,active} from './scenario.mjs';
 const $=id=>document.getElementById(id);
-let config={...defaults},time=0,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1;
+let config={...defaults},time=0,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1,settleUntil=0,lastReadout=0;
 const tr=(vi,en)=>lang==='vi'?vi:en;
 const point=p=>p?`(${p.x.toFixed(2)}, ${p.y.toFixed(2)}) m`:'—';
 function text(id,value){$(id).textContent=value;}
@@ -36,7 +36,7 @@ for(const button of document.querySelectorAll('.expand-view'))button.onclick=()=
 };
 function createView(id,color){
  const target=$(id),scene=new THREE.Scene();scene.background=new THREE.Color('#0d1827');
- const camera=new THREE.OrthographicCamera(-30,30,30,-30,0.1,500);let aspect=1;
+ const camera=new THREE.OrthographicCamera(-30,30,30,-30,0.1,500);let aspect=1,rig=null,previousRender=null;
  const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));target.appendChild(renderer.domElement);
  scene.add(new THREE.HemisphereLight(0xffffff,0x233448,3));
  const grid=new THREE.GridHelper(100,20,0x334b60,0x203245);scene.add(grid);
@@ -44,7 +44,23 @@ function createView(id,color){
  for(const [x,z] of [[100,7],[7,100]]){const road=new THREE.Mesh(new THREE.PlaneGeometry(x,z),roadMaterial);road.rotation.x=-Math.PI/2;road.position.y=.02;scene.add(road);}
  function box(c,wire=false){const mesh=new THREE.Mesh(new THREE.BoxGeometry(4,1.8,2.2),new THREE.MeshStandardMaterial({color:c,wireframe:wire}));mesh.position.y=1.1;scene.add(mesh);return mesh;}
  const main=box(color),observer=box(0x7eafff),reference=box(0x67e8c3,true);observer.rotation.y=Math.PI/2;
- function resize(){const {width,height}=target.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);aspect=width/height;render(frame(config,time));}
+ function marker(label,color,radius,offset){
+  const ring=new THREE.Mesh(new THREE.RingGeometry(radius-.10,radius,64),new THREE.MeshBasicMaterial({color,side:THREE.DoubleSide,depthWrite:false}));
+  ring.rotation.x=-Math.PI/2;ring.position.y=.10;scene.add(ring);
+  const tag=document.createElement('span');tag.className='position-tag';tag.textContent=label;tag.style.color='#'+color.toString(16).padStart(6,'0');target.appendChild(tag);
+  return {ring,tag,offset};
+ }
+ const mainMark=marker(id==='truth'?'A':'A′',color,id==='truth'?2.8:3.5,id==='truth'?-38:38);
+ const referenceMark=marker('A',0x67e8c3,2.8,-38),observerMark=marker('B',0x7eafff,4.2,0);
+ function placeMark(mark,p){
+  mark.ring.visible=Boolean(p);mark.tag.hidden=!p;if(!p)return;
+  mark.ring.position.set(p.x,.10,p.y);
+  const v=new THREE.Vector3(p.x,3,p.y).project(camera);
+  mark.tag.hidden=Math.abs(v.x)>1||Math.abs(v.y)>1;
+  mark.tag.style.left=`${(v.x+1)*target.clientWidth/2+mark.offset}px`;
+  mark.tag.style.top=`${(1-v.y)*target.clientHeight/2-(mark===observerMark?30:8)}px`;
+ }
+ function resize(){const {width,height}=target.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);aspect=width/height;settleUntil=performance.now()+1800;render(frame(config,time));}
  function render(f){
  // All perspectives use the same positions to frame the scene for comparison.
  const points=[f.physical,f.claimed,f.receiver,...(f.last?[f.last.claimed]:[])];
@@ -53,12 +69,19 @@ function createView(id,color){
  camera.position.set(cx+42,68,cz+60);camera.lookAt(cx,0,cz);camera.updateMatrixWorld();
  let halfX=0,halfY=0;
  for(const p of points){const v=new THREE.Vector3(p.x,1.1,p.y).applyMatrix4(camera.matrixWorldInverse);halfX=Math.max(halfX,Math.abs(v.x)+5);halfY=Math.max(halfY,Math.abs(v.y)+5);}
- const half=Math.max(13,halfY,halfX/aspect)/viewZoom;
+ const desiredHalf=Math.max(13,halfY+2,(halfX+3)/aspect)/viewZoom;
+ const now=performance.now(),dt=previousRender===null?0:Math.min((now-previousRender)/1000,.1);previousRender=now;
+ if(!rig)rig={x:cx,z:cz,half:desiredHalf};
+ const blend=window.matchMedia('(prefers-reduced-motion: reduce)').matches?1:1-Math.exp(-dt/0.22);
+ rig.x+=(cx-rig.x)*blend;rig.z+=(cz-rig.z)*blend;rig.half+=(desiredHalf-rig.half)*blend;
+ camera.position.set(rig.x+42,68,rig.z+60);camera.lookAt(rig.x,0,rig.z);camera.updateMatrixWorld();
+ const half=rig.half;
  camera.left=-half*aspect;camera.right=half*aspect;camera.top=half;camera.bottom=-half;camera.updateProjectionMatrix();
- const p=id==='truth'?f.physical:id==='reported'?f.claimed:f.last?.claimed;main.visible=Boolean(p);if(p)main.position.set(p.x,1.1,p.y);reference.visible=id!=='truth';reference.position.set(f.physical.x,1.1,f.physical.y);observer.position.set(f.receiver.x,1.1,f.receiver.y);renderer.render(scene,camera);}
+ const p=id==='truth'?f.physical:id==='reported'?f.claimed:f.last?.claimed;main.visible=Boolean(p);if(p)main.position.set(p.x,1.1,p.y);reference.visible=id!=='truth';reference.position.set(f.physical.x,1.1,f.physical.y);observer.position.set(f.receiver.x,1.1,f.receiver.y);placeMark(mainMark,p);placeMark(referenceMark,id==='truth'?null:f.physical);placeMark(observerMark,f.receiver);renderer.render(scene,camera);}
  new ResizeObserver(resize).observe(target);resize();return render;
 }
-function draw(){
+function draw(renderViews=true){
+ settleUntil=performance.now()+1800;
  const f=frame(config,time);$('time').value=time;text('time-value',`${time.toFixed(2)} s`);text('play',playing?tr('Tạm dừng','Pause'):tr('Phát','Play'));
  text('truth-value',`A: ${point(f.physical)}`);text('reported-value',`A′: ${point(f.claimed)}`);text('observed-value',f.last?`${point(f.last.claimed)} · ${tr('tuổi tiếp nhận','reception age')} ${f.age.toFixed(2)} s`:tr('Chưa nhận bản tin','No message received'));
  const lines=[`${tr('Độ lệch đang áp dụng','Applied offset')}: ${active(config,time)?point({x:config.dx,y:config.dy}):'(0, 0) m'}`,`${tr('Xe nhận B','Receiver B')}: ${point(f.receiver)}`];
@@ -66,10 +89,19 @@ function draw(){
  $('checks').replaceChildren(...lines.map(line=>{const p=document.createElement('p');p.className='checks-row';p.textContent=line;return p;}));
  text('counts',`${tr('Đã phát','Sent')}: ${f.sent.length} · ${tr('Đã nhận','Received')}: ${f.received.length}`);
  $('messages').replaceChildren(...f.sent.slice(-6).reverse().map(m=>{const row=document.createElement('tr'),arrived=m.received!==null&&m.received<=time;const state=m.received===null?tr('Bỏ theo cấu hình','Omitted by configuration'):arrived?tr('Đã nhận','Received'):tr('Đang chờ','Pending');for(const value of [m.id,m.sent.toFixed(2),arrived?m.received.toFixed(2):'—',state]){const cell=document.createElement('td');cell.textContent=value;row.appendChild(cell);}return row;}));
- for(const render of views)render(f);
+ if(renderViews)for(const render of views)render(f);
 }
 translate();fill();
 try{views=[createView('truth',0x67e8c3),createView('reported',0xffc477),createView('observed',0xffc477)];}catch{for(const el of document.querySelectorAll('.viewport'))el.replaceChildren();text('render-status','WebGL unavailable. Coordinate readouts and message exploration remain usable.');}
 draw();
-function tick(now){if(playing){if(lastTick!==null)time=Math.min(config.duration,time+Math.min((now-lastTick)/1000,0.1));if(time>=config.duration)playing=false;draw();}lastTick=now;requestAnimationFrame(tick);}
+function tick(now){
+ if(playing){
+  if(lastTick!==null)time=Math.min(config.duration,time+Math.min((now-lastTick)/1000,0.1));
+  if(time>=config.duration)playing=false;
+  // Text/table updates need not rebuild the DOM at animation-frame frequency.
+  if(now-lastReadout>=100||!playing){draw(false);lastReadout=now;}
+ }
+ if(playing||now<settleUntil){const f=frame(config,time);for(const render of views)render(f);}
+ lastTick=now;requestAnimationFrame(tick);
+}
 requestAnimationFrame(tick);
