@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "scope": "Synthetic implementation and package checks only",
+  "checks": {
+    "inventory_and_hashes": "PASS",
+    "relative_links_and_imports": "PASS",
+    "limited_private_content_patterns": "PASS",
+    "git_metadata_present": true,
+    "files": 21
+  },
+  "manifest_sha256": "3b62c1f948d96a928718d40700a362b161cb71bd42358054452d376cc5990ea6",
+  "tests": {
+    "command": [
+      "node",
+      "--test",
+      "tests/scenario.test.mjs"
+    ],
+    "exit_code": 0,
+    "output": "TAP version 13\n# Subtest: offset is constant inside the interval, absent outside, and end is exclusive\nok 1 - offset is constant inside the interval, absent outside, and end is exclusive\n  ---\n  duration_ms: 1.073194\n  ...\n# Subtest: constant offset cancels within a segment, but onset and termination jump\nok 2 - constant offset cancels within a segment, but onset and termination jump\n  ---\n  duration_ms: 1.109469\n  ...\n# Subtest: receiver cannot observe future or intentionally omitted messages\nok 3 - receiver cannot observe future or intentionally omitted messages\n  ---\n  duration_ms: 2.193351\n  ...\n# Subtest: rewind and JSON round trip reproduce exactly, with zero offset supported\nok 4 - rewind and JSON round trip reproduce exactly, with zero offset supported\n  ---\n  duration_ms: 0.638322\n  ...\n# Subtest: untrusted configuration rejects extra fields, malformed types and unbounded work\nok 5 - untrusted configuration rejects extra fields, malformed types and unbounded work\n  ---\n  duration_ms: 0.30071\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 44.409213\n"
+  },
+  "limitations": [
+    "Pattern scan is not an exhaustive security audit",
+    "No full browser/device matrix",
+    "No live vehicle, RF, or predictive-performance testing",
+    "No public publication or hosting"
+  ],
+  "browser_qa": {
+    "scope": "Manual check in local Codex browser",
+    "checks": [
+      "Three.js rendering visible",
+      "Seek to t=8 updates all readouts causally",
+      "Invalid start/end rejected and applied scene preserved",
+      "Apply negative X and positive Y offset",
+      "Vietnamese to English switch preserves scenario and time"
+    ],
+    "not_run": [
+      "Browser file-picker import/export end-to-end",
+      "Full mobile and browser matrix",
+      "WebGL-unavailable browser test"
+    ]
+  },
+  "publication_checks": {
+    "targeted_research_markers": "No matches in targeted cross-check",
+    "byte_identical_upstream_content": "Only selected licenses and bundled Three.js",
+    "personal_absolute_paths": "No matches for targeted workstation path patterns",
+    "limits": "Not an exhaustive privacy/security certification",
+    "git_history": "New local Git metadata connected only to the supplied public repository initial commit; no research repository history imported"
+  }
+}

@@ -1,0 +1,10 @@
+# Local environments and generated files
+.venv/
+__pycache__/
+*.py[cod]
+node_modules/
+.env
+.env.*
+.DS_Store
+coverage/
+# Keep public source selected explicitly; ignore rules do not remove tracked files.

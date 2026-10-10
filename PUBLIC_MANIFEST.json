@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "scope": "Reviewed public package bytes",
+  "files": {
+    ".github/ISSUE_TEMPLATE/bug_report.md": "dce298f589add3186c939757e34d96c1db2b79ae336ed49a46ae87751f688b90",
+    ".github/ISSUE_TEMPLATE/feature_request.md": "9db23922866be762a7e19137f326db5cdd775bd95ed7408ba8903ebb9fd0ba83",
+    ".github/PULL_REQUEST_TEMPLATE.md": "8c1847e408de5d92a0125a6f31bf2151600c9c02d269ffbbcd726bc836d0d041",
+    ".github/workflows/check.yml": "4b884fcd97bf64fcc1544f0011412d48dca1cb65cc87685200c4828b3edeb55c",
+    ".gitignore": "7eef8248c28a0672901d022a5ca10555e563ddbea4e33dc335ae68cc52705c20",
+    "CONTRIBUTING.md": "aecf9bbdbaa15eed626a3d6b7bcff75f8ad78f748b3613e9a52f3836bbbf46f7",
+    "LICENSE": "3dc4c9803ebd068efde344e1c78adbe70e0d2ff1e1e053a46538266ae40f9c1e",
+    "README.md": "28827823321743c019fa72fb946397f8e1837bc9536448451f7e2d7715789a09",
+    "SECURITY.md": "4077118d30a3df3f5c45880e4e420dc224eb9b67f7afaba339658a3b9f160f45",
+    "THIRD_PARTY_NOTICES.md": "46f6c0796c5b45e0a1faecd031f0c4fc72c64760059a977f35ccacac1065dfbd",
+    "docs/DATA_FORMAT.md": "40988ebf8bb20955500c4e7d8edf09601e00386febab0a98bb8d7c55c697954b",
+    "docs/RELEASE_SCOPE.md": "35f6dbabb8124ad22cb740e6975d8f663392009443bcb1de7d1ad7f577f1d060",
+    "scripts/verify_public.py": "eb2daa767721ee496c72d92fbe90ad434ecede600226a79c942eb9c8f3ca5fae",
+    "tests/scenario.test.mjs": "a164228fc27cfceb6688cf494e36178ab50e675808ac0bab900e5b882ba23a54",
+    "web/LICENSE": "3dc4c9803ebd068efde344e1c78adbe70e0d2ff1e1e053a46538266ae40f9c1e",
+    "web/index.html": "2305742090883d69b5439ef3875a717fe9829b78bfc5ef887fbfb6723bd68ac9",
+    "web/js/app.mjs": "da9d0dcf764c1b8dd4ec3bbd4cace37c4912f7295ea1f5cf9e70b9e25722e31e",
+    "web/js/scenario.mjs": "f7785125e64dd8cce0eefaf0fd8fe4a34ce21053673f183fb4826395fea044dd",
+    "web/style.css": "bf4592de54d5852a7b5f18eb11869ef97284818721c1c2622937db6d1bd09d20",
+    "web/vendor/three/LICENSE": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
+    "web/vendor/three/three.module.js": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495"
+  }
+}
