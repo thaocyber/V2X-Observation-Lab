@@ -68,7 +68,7 @@ configuration is included in this package. No backend inference is offered.
 
 ## Automated checks
 
-[VALIDATION.json](VALIDATION.json) contains the local implementation check report.
+`VALIDATION.json` contains the local implementation check report.
 Browser verification limits are documented there. GitHub Actions is not active:
 the current publishing token cannot create workflows. The ready-to-use configuration
 is preserved at [docs/ci/github-actions.yml.example](docs/ci/github-actions.yml.example).
