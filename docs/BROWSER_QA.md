@@ -1,35 +1,71 @@
-# Browser QA — v0.1.0 prerelease
+# QA record — v0.1.0 prerelease
 
-Tested on 2026-10-11 using the available Codex in-app browser and a local static
-server serving only `web/`. This is a smoke test, not a compatibility certification.
+Updated 2026-10-11 after post-release checks. These results cover the synthetic
+Lab, not detector effectiveness or real vehicles. No complete browser/device
+compatibility claim is made.
 
-## Observed passes
+Evidence summaries: [browser and bundle checks](qa/browser-smoke-2026-10-11.json)
+and [data audit](qa/data-audit-2026-10-11.json). These are recorded results, not
+raw browser logs. They identify the reviewed source commit and archive hash.
+The published v0.1.0 tag and release archives are unchanged.
 
-- All three guided presets, language switching and boundary navigation were exercised.
-- At 7 s in the impaired preset, the held message is demo-7, sent at 6 s and
-  received at 7 s. The receiver pair is demo-5 to demo-7, with displacement
-  (14, 0) m across 2 s; the sender pair spans 6 to 7 s with (3, 0) m.
-- Importing a synthetic scenario with offsets (20, -20), interval [0, 20),
-  delay 2 s and omission interval 1 updates the form and shows no received message.
-- Importing an object with unexpected fields displays a validation error.
-- Report JSON and Markdown buttons and the v0.1.0 footer are present.
-- No application console error was captured during these checks.
-- At a requested viewport width of 390 px, the document reported width 375 px:
-  no horizontal document overflow was observed. This does not establish real-device usability.
+## VERIFIED FACT — completed checks
 
-## Not verified / remaining checks
+| Check | Result and scope |
+| --- | --- |
+| Actual browser downloads | Scenario JSON, trace JSON, report JSON and Markdown were saved by the Codex in-app browser and read from disk. The scenario, trace and report matched expected generated values; Markdown matched the report renderer exactly. |
+| Download/import round trip | The actual downloaded impaired scenario was imported on the public site. Seeking to 7 s restored held message demo-7, 5 received messages out of 8 sent, position (-4, 0) m, and data age 1 s. |
+| Sender/receiver distinction | At 7 s, receiver pair demo-5 to demo-7 spans 2 s and 14 m; sender pair spans 6 to 7 s and 3 m. |
+| Synthetic data audit | 435 configurations across 13 times (5,655 snapshots) matched an independently constructed formula/schedule oracle. JSON replay and the scenario embedded in Markdown matched. Eleven invalid inputs were rejected. This is a bounded deterministic matrix, not exhaustive testing or a detection benchmark. |
+| Guided scenarios | All three presets, language switching and boundary navigation were exercised. The later walkthrough checked baseline at 6.5 s, offset at 5/10/15 s, and impaired at 7/15/16 s. |
+| Input limits | Importing offsets (20, -20), interval [0, 20), delay 2 s and omission interval 1 updated the form and showed no received message. An object with unexpected fields produced a validation error. |
+| Console | No application console error was captured during the recorded local-bundle and fallback checks. |
 
-- The browser automation download event timed out after clicking report JSON.
-  No console error was captured, but a completed downloaded file was not confirmed.
-  Report serialization and content are covered by the automated module tests;
-  a maintainer should verify scenario, trace, JSON and Markdown downloads in a regular browser.
-- Chrome and Firefox were not available as controllable browsers; no separate
-  Chrome/Firefox compatibility result is claimed.
-- Physical mobile devices, touch gestures, screen readers and WebGL-disabled
-  fallback were not tested.
-- Dependencies are bundled locally and the isolated source tests pass; a physical
-  network-disconnected browser session has not been tested.
+The earlier download-event timeout did not establish a download failure.
+Subsequent checks verified all four saved files and their contents. Standalone
+Chrome/Firefox download behavior remains untested.
 
-Before a live Arsenal demo, complete the download round trip, offline browser
-run, Chrome/Firefox and mobile checks. CI activation is tracked separately in
-[the release checklist](RELEASE_CHECKLIST.md).
+## VERIFIED FACT — constrained and simulated checks
+
+- **Standalone bundle:** the extracted release ZIP ran from a loopback HTTP
+  server outside the checkout. A test server applied CSP `default-src 'self'`
+  and `connect-src 'none'` (with local styling/image allowances), restricting
+  external resources and data connections. The app loaded and the impaired
+  scenario at 7 s matched. This was not an operating-system network disconnect.
+- **WebGL fallback:** a temporary copy forced renderer construction to throw.
+  The fallback message appeared; coordinate readouts, timeline and received
+  message checks remained usable at 7 s. Production files were unchanged.
+  This did not exercise an actual GPU failure or later WebGL context loss.
+- **Narrow viewport:** at 390 px viewport width, document width was 375 px;
+  three canvases were created and controls stacked without horizontal document
+  overflow. This was desktop viewport emulation, not a physical phone test.
+- **Demo:** the functional walkthrough matched the expected values. It was not
+  a timed five-minute presenter rehearsal.
+
+## INFERENCE
+
+The observed results support a reproducible synthetic demonstration in the
+available browser. They do not establish compatibility with every browser,
+physical device or venue network configuration.
+
+## OPEN QUESTION — remaining release checks
+
+- [ ] Test standalone Chrome and Firefox, including all four downloads and import.
+- [ ] Test a physical mobile device, touch controls and readability.
+- [ ] Check keyboard/screen-reader accessibility.
+- [ ] Run the extracted bundle with the operating system disconnected from Internet.
+- [ ] Test a real WebGL-disabled environment or GPU/context failure.
+- [ ] Rehearse the presenter script with a timer and the final display setup.
+
+## DECISION
+
+Retain prerelease status pending the relevant release gates. Use distinct labels
+for observed passes, simulated checks and untested environments. New features
+require corresponding regression checks; this record does not pre-approve v1.0.0.
+
+## CI evidence
+
+The workflow passed for commit `331f1d7` after the public manifest was refreshed:
+[GitHub Actions run](https://github.com/thaocyber/V2X-Observation-Lab/actions/runs/38152456419).
+That result applies to that commit, not automatically to later changes.
+See [the release checklist](RELEASE_CHECKLIST.md) for packaging context.

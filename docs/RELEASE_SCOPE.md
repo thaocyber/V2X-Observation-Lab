@@ -24,7 +24,9 @@ reception delay and onset effects. It is not evidence of a detector's performanc
 
 The public repository is https://github.com/thaocyber/V2X-Observation-Lab.
 The website is hosted at https://v2x.tcybertrust.id.vn on Cloudflare Pages.
-Full mobile/browser compatibility and external accessibility review remain pending. The vendor bundle's original download provenance has not
+Actual downloads, scenario replay and constrained local-bundle checks are recorded
+in [BROWSER_QA.md](BROWSER_QA.md). Full mobile/browser compatibility, physical
+network-disconnection testing and external accessibility review remain pending. The vendor bundle's original download provenance has not
 been independently revalidated; bundled hashes establish local byte identity.
 No model inference or safety assessment is provided.
 

@@ -1,0 +1,66 @@
+{
+  "scope": "V2X Observation Lab v0.1.0 browser smoke QA",
+  "date": "2026-10-11",
+  "status": "PASS_WITH_UNTESTED_ENVIRONMENTS",
+  "browser": "Codex in-app browser",
+  "downloads": {
+    "status": "PASS",
+    "snapshotTime": 7,
+    "files": [
+      "v2x-synthetic-scenario (1).json",
+      "v2x-synthetic-trace.json",
+      "v2x-observation-report (1).json",
+      "v2x-observation-report.md"
+    ],
+    "checks": [
+      "actual browser files compared to model output",
+      "report/trace/scenario consistency",
+      "Markdown exact match"
+    ]
+  },
+  "roundTrip": "Actual downloaded scenario imported on public website; time 7 restores demo-7, five arrivals and receiver displacement 14 m over 2 s",
+  "standalone": {
+    "archive": "v2x-observation-lab-0.1.0-offline.zip",
+    "sha256": "c7ac28517e93696b66973ddf4b391c1c4a4c40f99056b1ce4f3f389b2b0283b3",
+    "result": "PASS",
+    "method": "Extracted bundle served from loopback with CSP default-src self and connect-src none; assets and data remained usable; no app console errors",
+    "limit": "Not an OS network disconnect test"
+  },
+  "webglFallback": {
+    "result": "PASS_SIMULATED",
+    "method": "Temporary copy forced WebGLRenderer construction to throw; production files unchanged",
+    "observation": "Fallback message, coordinates, timeline and received-message checks remain usable at 7 s",
+    "limit": "Actual GPU/context failure not tested"
+  },
+  "responsive": {
+    "width": 390,
+    "documentWidth": 375,
+    "canvases": 3,
+    "result": "PASS_SMOKE",
+    "limit": "No physical mobile or touch validation"
+  },
+  "demo": {
+    "presetCount": 3,
+    "checkedMoments": [
+      6.5,
+      5,
+      10,
+      15,
+      7,
+      15,
+      16
+    ],
+    "result": "PASS",
+    "limit": "Functional walkthrough, not a timed presenter rehearsal"
+  },
+  "remaining": [
+    "Standalone Chrome and Firefox unavailable to browser automation",
+    "Physical mobile/touch and screen-reader tests",
+    "Full OS network disconnect",
+    "Actual GPU/WebGL-disabled browser testing"
+  ],
+  "recordType": "Recorded QA summary; not raw browser logs",
+  "applicationVersion": "0.1.0",
+  "sourceCommit": "331f1d756c098e4150f939aff0ae1f19ba7c8c1b",
+  "recordedDate": "2026-10-11"
+}

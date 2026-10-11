@@ -6,7 +6,7 @@ Only the standalone synthetic Lab is published. The research repository is not
 part of this distribution. The public manifest identifies reviewed file bytes;
 it is not an exhaustive security or privacy certification.
 
-## Confirmed before release
+## Initial release checks and subsequent verification
 
 - Review the complete tracked inventory and local links/imports.
 - Scan all six inherited Lab commits for targeted research names, personal paths
@@ -25,6 +25,14 @@ connections lacked workflow-write permission. The maintainer subsequently added
 copy is removed and the public manifest is refreshed. Runs and their validation
 artifacts are available under the repository Actions tab; verify the result for
 the relevant commit. The v0.1.0 tag and its attached archives remain unchanged.
+
+## Post-release QA update
+
+Actual downloads and downloaded-scenario replay have now been verified in the
+Codex in-app browser. Local bundle checks used CSP restrictions; WebGL fallback
+used an injected renderer-construction failure in a temporary copy. These are
+not full network-disconnect or actual GPU-failure tests. The remaining browser,
+device and rehearsal gates are listed in [BROWSER_QA.md](BROWSER_QA.md).
 
 ## Release contents
 

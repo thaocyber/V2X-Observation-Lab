@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "scenarioConfigurations": 435,
+  "snapshots": 5655,
+  "invalidInputsRejected": 11,
+  "checks": [
+    "independent message schedule and positions",
+    "receiver held message and ages",
+    "sender and receiver pairs",
+    "JSON serialization and deterministic replay",
+    "Markdown embedded scenario round trip",
+    "targeted private-content markers"
+  ],
+  "limits": [
+    "Module-level generation and filesystem round trip; not a browser download confirmation",
+    "Pattern scan is not an exhaustive privacy audit"
+  ],
+  "browserImport": {
+    "url": "https://v2x.tcybertrust.id.vn/",
+    "scenario": "impaired-scenario.json",
+    "time": 7,
+    "heldMessage": "demo-7",
+    "position": {
+      "x": -4,
+      "y": 0
+    },
+    "sentCount": 8,
+    "receivedCount": 5,
+    "dataAge": 1,
+    "receiverDifferenceX": 14,
+    "receiverPairSentInterval": 2,
+    "status": "PASS"
+  },
+  "recordType": "Recorded QA summary; not raw browser logs",
+  "applicationVersion": "0.1.0",
+  "sourceCommit": "331f1d756c098e4150f939aff0ae1f19ba7c8c1b",
+  "recordedDate": "2026-10-11"
+}
