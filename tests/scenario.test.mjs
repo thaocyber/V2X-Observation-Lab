@@ -24,3 +24,24 @@ test('untrusted configuration rejects extra fields, malformed types and unbounde
  for(const c of [null,[],{}, {...defaults,extra:1},{...defaults,dx:'8'},{...defaults,dy:Infinity},{...defaults,start:15,end:5},{...defaults,duration:100000},{...defaults,dropEvery:2.5},{...defaults,delay:-1}])assert.throws(()=>validate(c));
  assert.throws(()=>frame(defaults,-1));assert.throws(()=>frame(defaults,NaN));
 });
+
+import {presets} from '../web/js/presets.mjs';
+test('guided presets reproduce the stated receiver observation gaps and boundary effects',()=>{
+ for(const c of Object.values(presets))assert.deepEqual(validate(c),c);
+ const baseline=frame(presets.baseline,6.5);
+ assert.equal(baseline.last.sent,6);
+ assert.notDeepEqual(baseline.physical,baseline.last.claimed);
+ assert.equal(frame(presets.offset,5).displacement.claimed.x,11);
+ assert.equal(frame(presets.offset,10).displacement.claimed.x,3);
+ assert.equal(frame(presets.offset,15).displacement.claimed.x,-5);
+ const impaired=presets.impaired;
+ assert.equal(messages(impaired).find(m=>m.sent===5).received,null);
+ assert.equal(frame(impaired,6.99).last.offsetActive,false);
+ assert.equal(frame(impaired,7).last.sent,6);
+ assert.equal(frame(impaired,7).last.offsetActive,true);
+ assert.equal(frame(impaired,15).last.offsetActive,true);
+ assert.equal(frame(impaired,16).last.offsetActive,false);
+ const pair=frame(impaired,7).received.slice(-2);
+ assert.equal(pair[1].sent-pair[0].sent,2);
+ assert.equal(pair[1].claimed.x-pair[0].claimed.x,14);
+});

@@ -9,11 +9,11 @@ in DATA_FORMAT.md. Vendor source is unchanged and retains its license.
 
 ## DECISION
 
-The distribution is browser-local and synthetic-only. No Git metadata, backend,
+The web distribution is browser-local and synthetic-only. No Git metadata, backend,
 learned models, checkpoints, measured replay, archived evaluation reports or
 external input data are included. Publish only the web directory as static content.
 The selected security reporting route is GitHub Private Vulnerability Reporting;
-activation requires a future repository and is not implied by these documents.
+activation must be verified in repository settings and is not implied by these documents.
 
 ## INFERENCE
 
@@ -23,7 +23,14 @@ reception delay and onset effects. It is not evidence of a detector's performanc
 ## OPEN QUESTION / limits
 
 The public repository is https://github.com/thaocyber/V2X-Observation-Lab.
-A hosted domain and verified private reporting route are not configured. Full mobile/browser compatibility and external accessibility
+The website is hosted at https://v2x.tcybertrust.id.vn on Cloudflare Pages.
+Private reporting activation, full mobile/browser compatibility and external accessibility
 review remain pending. The vendor bundle's original download provenance has not
 been independently revalidated; bundled hashes establish local byte identity.
-No experiments, model inference, safety assessment or public deployment were run.
+No model inference or safety assessment is provided.
+
+The MVP focuses on receiver observation limits. Guided presets illustrate
+sampling gaps, constant-offset cancellation within a segment and delayed or
+omitted boundary messages. Ground truth is an optional teaching overlay in the
+receiver pane, never an assumed receiver capability. Sender and receiver
+differences identify their separate message pairs; they are not detector scores.
