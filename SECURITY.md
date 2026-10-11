@@ -4,11 +4,12 @@ This is a pre-release browser-local tool. There is no stable-version support
 commitment or promised response SLA. The selected reporting channel is GitHub
 Private Vulnerability Reporting for
 [thaocyber/V2X-Observation-Lab](https://github.com/thaocyber/V2X-Observation-Lab).
-Activation has not been verified. The maintainer must enable and test this channel;
-until then, it must not be treated as an available private reporting route. No security email is offered.
+Private reporting was enabled and verified through the GitHub API on 2026-10-11.
+Use [the private reporting form](https://github.com/thaocyber/V2X-Observation-Lab/security/advisories/new).
+No security email is offered.
 
-Once configured, use Security > Advisories > Report a vulnerability in that
-repository. Until then, ask the maintainer for a private route without sharing
+Use Security > Advisories > Report a vulnerability in that repository.
+If the form is unavailable, ask the maintainer for a private route without sharing
 vulnerability details publicly. Do not disclose payloads or secrets in public
 issues or pull requests. Include revision, browser, minimal synthetic reproduction,
 impact and sanitized evidence in a private report.

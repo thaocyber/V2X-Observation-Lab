@@ -6,45 +6,23 @@
     "relative_links_and_imports": "PASS",
     "limited_private_content_patterns": "PASS",
     "git_metadata_present": true,
-    "files": 21
+    "files": 31
   },
-  "manifest_sha256": "67eafd3273258e1db4a176c1df9261868772b19d8b2fda96beded025959f345b",
+  "manifest_sha256": "14c0b4f1f5915b1f0065170b3920fd9debcdea6a008b655a3ee82536994546c2",
   "tests": {
     "command": [
       "node",
       "--test",
+      "tests/report.test.mjs",
       "tests/scenario.test.mjs"
     ],
     "exit_code": 0,
-    "output": "TAP version 13\n# Subtest: offset is constant inside the interval, absent outside, and end is exclusive\nok 1 - offset is constant inside the interval, absent outside, and end is exclusive\n  ---\n  duration_ms: 1.105121\n  ...\n# Subtest: constant offset cancels within a segment, but onset and termination jump\nok 2 - constant offset cancels within a segment, but onset and termination jump\n  ---\n  duration_ms: 1.109137\n  ...\n# Subtest: receiver cannot observe future or intentionally omitted messages\nok 3 - receiver cannot observe future or intentionally omitted messages\n  ---\n  duration_ms: 2.058441\n  ...\n# Subtest: rewind and JSON round trip reproduce exactly, with zero offset supported\nok 4 - rewind and JSON round trip reproduce exactly, with zero offset supported\n  ---\n  duration_ms: 0.552439\n  ...\n# Subtest: untrusted configuration rejects extra fields, malformed types and unbounded work\nok 5 - untrusted configuration rejects extra fields, malformed types and unbounded work\n  ---\n  duration_ms: 0.266684\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 39.445322\n"
+    "output": "TAP version 13\n# Subtest: report round trip reproduces held message, counts, ages and unequal sender/receiver pairs\nok 1 - report round trip reproduces held message, counts, ages and unequal sender/receiver pairs\n  ---\n  duration_ms: 1.495616\n  ...\n# Subtest: reports are deterministic, distinguish no arrival and reject untrusted configurations\nok 2 - reports are deterministic, distinguish no arrival and reject untrusted configurations\n  ---\n  duration_ms: 0.606848\n  ...\n# Subtest: Markdown summary includes scenario, paired observations and explicit limitations\nok 3 - Markdown summary includes scenario, paired observations and explicit limitations\n  ---\n  duration_ms: 0.274196\n  ...\n# Subtest: offset is constant inside the interval, absent outside, and end is exclusive\nok 4 - offset is constant inside the interval, absent outside, and end is exclusive\n  ---\n  duration_ms: 1.618204\n  ...\n# Subtest: constant offset cancels within a segment, but onset and termination jump\nok 5 - constant offset cancels within a segment, but onset and termination jump\n  ---\n  duration_ms: 0.543421\n  ...\n# Subtest: receiver cannot observe future or intentionally omitted messages\nok 6 - receiver cannot observe future or intentionally omitted messages\n  ---\n  duration_ms: 2.23322\n  ...\n# Subtest: rewind and JSON round trip reproduce exactly, with zero offset supported\nok 7 - rewind and JSON round trip reproduce exactly, with zero offset supported\n  ---\n  duration_ms: 0.497081\n  ...\n# Subtest: untrusted configuration rejects extra fields, malformed types and unbounded work\nok 8 - untrusted configuration rejects extra fields, malformed types and unbounded work\n  ---\n  duration_ms: 0.283303\n  ...\n# Subtest: guided presets reproduce the stated receiver observation gaps and boundary effects\nok 9 - guided presets reproduce the stated receiver observation gaps and boundary effects\n  ---\n  duration_ms: 0.311496\n  ...\n1..9\n# tests 9\n# suites 0\n# pass 9\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 41.996895\n"
   },
   "limitations": [
     "Pattern scan is not an exhaustive security audit",
     "No full browser/device matrix",
     "No live vehicle, RF, or predictive-performance testing",
-    "No public publication or hosting"
-  ],
-  "browser_qa": {
-    "scope": "Manual check in local Codex browser",
-    "checks": [
-      "Three.js rendering visible",
-      "Seek to t=8 updates all readouts causally",
-      "Invalid start/end rejected and applied scene preserved",
-      "Apply negative X and positive Y offset",
-      "Vietnamese to English switch preserves scenario and time"
-    ],
-    "not_run": [
-      "Browser file-picker import/export end-to-end",
-      "Full mobile and browser matrix",
-      "WebGL-unavailable browser test"
-    ]
-  },
-  "publication_checks": {
-    "targeted_research_markers": "No matches in targeted cross-check",
-    "byte_identical_upstream_content": "Only selected licenses and bundled Three.js",
-    "personal_absolute_paths": "No matches for targeted workstation path patterns",
-    "limits": "Not an exhaustive privacy/security certification",
-    "git_history": "New local Git metadata connected only to the supplied public repository initial commit; no research repository history imported"
-  },
-  "github_actions": "Not enabled: publishing token lacks workflow scope; configuration stored as non-active template"
+    "This script does not verify deployed hosting or repository access settings"
+  ]
 }

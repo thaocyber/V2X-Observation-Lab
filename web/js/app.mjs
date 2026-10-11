@@ -1,5 +1,6 @@
 import * as THREE from '../vendor/three/three.module.js';
 import {defaults,validate,frame,messages,active} from './scenario.mjs';
+import {createReport,reportMarkdown,toolVersion} from './report.mjs';
 import {presets} from './presets.mjs';
 const $=id=>document.getElementById(id);
 let config={...defaults},time=0,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1,settleUntil=0,lastReadout=0;
@@ -15,6 +16,12 @@ $('config').addEventListener('submit',e=>{e.preventDefault();try{const next={...
 $('config').addEventListener('input',e=>{if(e.target.type!=='file')notice('Có thay đổi chưa áp dụng. Xuất JSON dùng cấu hình đã áp dụng.','Unapplied edits. JSON export uses the applied configuration.');});
 $('defaults').onclick=()=>apply({...defaults});
 $('export').onclick=()=>download('v2x-synthetic-scenario.json',config);
+$('report-json').onclick=()=>download('v2x-observation-report.json',createReport(config,time));
+$('report-md').onclick=()=>{
+ const url=URL.createObjectURL(new Blob([reportMarkdown(createReport(config,time))],{type:'text/markdown;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download='v2x-observation-report.md';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+text('tool-version',`v${toolVersion}`);
 $('trace').onclick=()=>download('v2x-synthetic-trace.json',{version:1,kind:'synthetic-trace',generator:'linear-motion-v1',units:{position:'metres',time:'seconds'},scenario:config,messages:messages(config)});
 $('import').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>8192)throw Error('File exceeds 8 KiB');apply(JSON.parse(await file.text()));}catch(err){text('error',tr('Không nhập được tệp: ','Cannot import file: ')+err.message);}finally{e.target.value='';}};
 $('play').onclick=()=>{if(time>=config.duration)time=0;playing=!playing;lastTick=null;draw();};

@@ -13,7 +13,7 @@ The web distribution is browser-local and synthetic-only. No Git metadata, backe
 learned models, checkpoints, measured replay, archived evaluation reports or
 external input data are included. Publish only the web directory as static content.
 The selected security reporting route is GitHub Private Vulnerability Reporting;
-activation must be verified in repository settings and is not implied by these documents.
+activation was confirmed through the GitHub API on 2026-10-11.
 
 ## INFERENCE
 
@@ -24,8 +24,7 @@ reception delay and onset effects. It is not evidence of a detector's performanc
 
 The public repository is https://github.com/thaocyber/V2X-Observation-Lab.
 The website is hosted at https://v2x.tcybertrust.id.vn on Cloudflare Pages.
-Private reporting activation, full mobile/browser compatibility and external accessibility
-review remain pending. The vendor bundle's original download provenance has not
+Full mobile/browser compatibility and external accessibility review remain pending. The vendor bundle's original download provenance has not
 been independently revalidated; bundled hashes establish local byte identity.
 No model inference or safety assessment is provided.
 

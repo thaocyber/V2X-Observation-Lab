@@ -96,7 +96,7 @@ def main():
             if run.returncode:
                 raise ValueError('Synthetic behavior tests failed')
         result['status'] = 'PASS'
-        result['limitations'] = ['Pattern scan is not an exhaustive security audit','No full browser/device matrix','No live vehicle, RF, or predictive-performance testing','No public publication or hosting']
+        result['limitations'] = ['Pattern scan is not an exhaustive security audit','No full browser/device matrix','No live vehicle, RF, or predictive-performance testing','This script does not verify deployed hosting or repository access settings']
     except Exception as exc:
         result['error'] = str(exc); print(str(exc),file=sys.stderr)
     if args.report:

@@ -5,8 +5,7 @@ explanations, accessibility, synthetic scenarios and reproducible UI bug fixes.
 Read README and docs/DATA_FORMAT.md before changing scenario behavior.
 
 Use a focused change. Describe expected/actual behavior, affected revision, browser
-and exact reproduction steps. Use the issue/PR templates after a GitHub repository
-is created. Security reports follow SECURITY.md and must not be filed publicly.
+and exact reproduction steps. Use the issue/PR templates in the GitHub repository. Security reports follow SECURITY.md and must not be filed publicly.
 
 Use only authored synthetic fixtures or inputs with documented redistribution
 rights. Never attach secrets, real location traces or proprietary materials.
