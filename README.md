@@ -100,9 +100,10 @@ The offline bundle uses the same files; no backend inference is offered.
 ## Automated checks
 
 `VALIDATION.json` contains the local implementation check report.
-Browser verification limits are documented there. GitHub Actions is not active:
-the current publishing token cannot create workflows. The ready-to-use configuration
-is preserved at [docs/ci/github-actions.yml.example](docs/ci/github-actions.yml.example).
-A maintainer with workflow permission can move it to `.github/workflows/check.yml`,
-refresh the public manifest, run checks, and commit/push. Once enabled, its run
-uploads a `public-package-validation` JSON artifact. Until then, run checks locally.
+Browser verification limits are documented in [docs/BROWSER_QA.md](docs/BROWSER_QA.md).
+[GitHub Actions](https://github.com/thaocyber/V2X-Observation-Lab/actions)
+runs [.github/workflows/check.yml](.github/workflows/check.yml) on pushes and pull
+requests. It verifies the reviewed inventory, local links and synthetic tests,
+and uploads a `public-package-validation` JSON artifact. Check the run for the
+specific commit before treating it as passing. These checks do not block
+Cloudflare deployment automatically.

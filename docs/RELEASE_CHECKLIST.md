@@ -17,14 +17,14 @@ it is not an exhaustive security or privacy certification.
 - Run deterministic scenario and report tests in an isolated source copy.
 - Check the actual browser interactions and record limits in [BROWSER_QA.md](BROWSER_QA.md).
 
-## CI limitation
+## CI after the initial prerelease
 
-GitHub Actions is allowed on the repository, but creating the workflow was denied
-with HTTP 403 by both the publishing token and the GitHub integration. Until an
-owner enables it, no green CI run is claimed. The workflow is prepared at
-`docs/ci/github-actions.yml.example`. A maintainer can add it as
-`.github/workflows/check.yml`, refresh PUBLIC_MANIFEST.json, run verification,
-and push. The first workflow run must pass before claiming active CI.
+The initial v0.1.0 tag did not include an active workflow because both publishing
+connections lacked workflow-write permission. The maintainer subsequently added
+`.github/workflows/check.yml` to main. The obsolete `github/workflows/check.yml`
+copy is removed and the public manifest is refreshed. Runs and their validation
+artifacts are available under the repository Actions tab; verify the result for
+the relevant commit. The v0.1.0 tag and its attached archives remain unchanged.
 
 ## Release contents
 
