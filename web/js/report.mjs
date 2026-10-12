@@ -1,5 +1,5 @@
 import {validate,messages,frame} from './scenario.mjs';
-export const toolVersion='0.1.0';
+export const toolVersion='0.2.0-dev';
 const difference=(a,b)=>({x:b.x-a.x,y:b.y-a.y});
 export function createReport(input,time=0){
  const scenario=validate(input),snapshot=frame(scenario,time),trace=messages(scenario);

@@ -1,3 +1,35 @@
+# QA record — display updates, 2026-10-12
+
+Development build `0.2.0-dev`, following source commit `93b4ae1`. This section
+covers new display behavior; the v0.1.0 archive record below remains historical.
+
+## VERIFIED FACT — current display checks
+
+- Automated tests cover arrived-only receiver histories, hidden-data isolation in
+  camera framing, rewind/reset, display toggles and report invariance.
+- In the Codex in-app browser, both camera modes and all three presets were
+  exercised at 7 s after seeking from 16 s. Receiver X positions were -9 m
+  (baseline), -1 m (offset), and -4 m (impaired).
+- Top-down rendering showed labeled rings and history samples. The receiver
+  showed ground truth only with its teaching overlay enabled.
+- Two actual downloaded JSON reports for the impaired preset at 7 s, before and
+  after changing camera mode, history visibility, ground-truth overlay and zoom,
+  were identical and matched the report generator. Both identify `0.2.0-dev`.
+- Receiver expansion/collapse and fit were exercised. At a 390 px emulated
+  viewport, document width was 375 px with three canvases and no horizontal
+  document overflow. This is not a physical mobile-device test.
+
+## OPEN QUESTION — limits
+
+Standalone Chrome/Firefox, physical mobile devices, frame-rate measurements and
+accessibility certification remain untested. Browser automation timed out on the
+semantic Fit button click; a direct visible-button click was used instead.
+These checks establish neither detector effectiveness nor real-vehicle behavior.
+The new event-log feature and a final three-page submission PDF are not included
+in this display increment. The published v0.1.0 archives are unchanged.
+
+---
+
 # QA record — v0.1.0 prerelease
 
 Updated 2026-10-11 after post-release checks. These results cover the synthetic

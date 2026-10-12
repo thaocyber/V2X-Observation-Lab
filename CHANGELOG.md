@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased — 0.2.0 development
+
+- Oblique/top-down camera selection and optional position histories.
+- Bilingual sample/line legend distinguishing truth, claims and the receiver.
+- Receiver trails and camera framing use arrived claims only, unless the explicit
+  teaching overlay is enabled. Camera memory resets on rewind or visibility changes.
+- Display-data regression tests and browser checks; report schemas unchanged.
+
+The application identifies this work as `0.2.0-dev`; no v0.2.0 release is published.
+
 ## 0.1.0 — 2026-10-11
 
 Initial MVP for exploring receiver observation limits in synthetic

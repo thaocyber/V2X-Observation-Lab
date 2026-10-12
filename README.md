@@ -33,6 +33,13 @@ Sender-side changes can occur before the receiver sees any corresponding message
 The receiver pane hides the synthetic ground-truth overlay by default; enabling
 it is a teaching aid, not information available to the receiver.
 
+Choose oblique or top-down viewing, show/hide position history, or expand a pane.
+Mint marks A (synthetic truth), gold marks A′ (the claim), and blue marks B
+(the receiver). Dots are samples; dashed links show sample order, not a verified
+physical route. The receiver history contains only arrived claims. Camera framing
+uses each pane's visible data; hidden truth cannot move the receiver camera.
+Rewinding or resetting rebuilds histories without retaining future points.
+
 Sender differences use consecutive sent messages; receiver differences use the
 last two arrived messages and show their send-time gap. These may be different
 pairs. Equal differences do not prove an absolute position is correct.

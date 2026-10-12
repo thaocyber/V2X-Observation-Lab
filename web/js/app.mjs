@@ -2,6 +2,7 @@ import * as THREE from '../vendor/three/three.module.js';
 import {defaults,validate,frame,messages,active} from './scenario.mjs';
 import {createReport,reportMarkdown,toolVersion} from './report.mjs';
 import {presets} from './presets.mjs';
+import {viewData} from './view-data.mjs';
 const $=id=>document.getElementById(id);
 let config={...defaults},time=0,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1,settleUntil=0,lastReadout=0;
 let selectedPreset=null;
@@ -33,6 +34,8 @@ function setZoom(value){viewZoom=Math.max(0.75,Math.min(4,value));text('zoom-val
 $('zoom-in').onclick=()=>setZoom(viewZoom+0.25);
 $('zoom-out').onclick=()=>setZoom(viewZoom-0.25);
 $('fit-view').onclick=()=>setZoom(1);
+$('camera-mode').onchange=()=>draw();
+$('show-trails').onchange=()=>draw();
 for(const button of document.querySelectorAll('.expand-view'))button.onclick=()=>{
  const card=button.closest('article'),expand=!card.classList.contains('expanded');
  for(const other of document.querySelectorAll('.expand-view')){
@@ -73,7 +76,7 @@ function observationGuide(f){
 }
 function createView(id,color){
  const target=$(id),scene=new THREE.Scene();scene.background=new THREE.Color('#0d1827');
- const camera=new THREE.OrthographicCamera(-30,30,30,-30,0.1,500);let aspect=1,rig=null,previousRender=null;
+ const camera=new THREE.OrthographicCamera(-30,30,30,-30,0.1,500);let aspect=1,rig=null,previousRender=null,previousTime=null,previousConfig=null,previousScope=null;
  const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));target.appendChild(renderer.domElement);
  scene.add(new THREE.HemisphereLight(0xffffff,0x233448,3));
  const grid=new THREE.GridHelper(100,20,0x334b60,0x203245);scene.add(grid);
@@ -89,6 +92,25 @@ function createView(id,color){
  }
  const mainMark=marker(id==='truth'?'A':'A′',color,id==='truth'?2.8:3.5,id==='truth'?-38:38);
  const referenceMark=marker('A',0x67e8c3,2.8,-38),observerMark=marker('B',0x7eafff,4.2,0);
+ function historyMark(color){
+  const geometry=new THREE.BufferGeometry();
+  const line=new THREE.Line(geometry,new THREE.LineDashedMaterial({color,dashSize:.65,gapSize:.45,transparent:true,opacity:.85}));
+  const dots=new THREE.Points(geometry,new THREE.PointsMaterial({color,size:5,sizeAttenuation:false}));
+  scene.add(line,dots);return {line,dots,key:null};
+ }
+ const trailMark=historyMark(color),referenceHistory=historyMark(0x67e8c3);
+ function updateHistory(mark,points){
+  const key=JSON.stringify(points);if(mark.key===key)return;mark.key=key;
+  const geometry=new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(p.x,.20,p.y)));
+  mark.line.geometry.dispose();mark.line.geometry=geometry;mark.dots.geometry=geometry;
+  mark.line.visible=points.length>1;mark.dots.visible=points.length>0;
+  if(points.length>1)mark.line.computeLineDistances();
+ }
+ function orient(x,z){
+  if($('camera-mode').value==='top'){camera.up.set(0,0,-1);camera.position.set(x,90,z);}
+  else{camera.up.set(0,1,0);camera.position.set(x+42,68,z+60);}
+  camera.lookAt(x,0,z);camera.updateMatrixWorld();
+ }
  function placeMark(mark,p){
   mark.ring.visible=Boolean(p);mark.tag.hidden=!p;if(!p)return;
   mark.ring.position.set(p.x,.10,p.y);
@@ -99,11 +121,16 @@ function createView(id,color){
  }
  function resize(){const {width,height}=target.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);aspect=width/height;settleUntil=performance.now()+1800;render(frame(config,time));}
  function render(f){
- // All perspectives use the same positions to frame the scene for comparison.
- const points=[f.physical,f.claimed,f.receiver,...(f.last?[f.last.claimed]:[])];
+ const scope=[$('camera-mode').value,$('show-trails').checked,$('show-reference').checked].join(':');
+ // Drop camera memory when the visible information changes or time rewinds.
+ if(previousConfig!==config||previousScope!==scope||(previousTime!==null&&f.time<previousTime))rig=null;
+ previousConfig=config;previousScope=scope;previousTime=f.time;
+ const data=viewData(id,f,{trails:$('show-trails').checked,reference:$('show-reference').checked});
+ const points=data.framing;
+ updateHistory(trailMark,data.trail);updateHistory(referenceHistory,data.referenceTrail);
  const xs=points.map(p=>p.x),zs=points.map(p=>p.y);
  const cx=(Math.min(...xs)+Math.max(...xs))/2,cz=(Math.min(...zs)+Math.max(...zs))/2;
- camera.position.set(cx+42,68,cz+60);camera.lookAt(cx,0,cz);camera.updateMatrixWorld();
+ orient(cx,cz);
  let halfX=0,halfY=0;
  for(const p of points){const v=new THREE.Vector3(p.x,1.1,p.y).applyMatrix4(camera.matrixWorldInverse);halfX=Math.max(halfX,Math.abs(v.x)+5);halfY=Math.max(halfY,Math.abs(v.y)+5);}
  const desiredHalf=Math.max(13,halfY+2,(halfX+3)/aspect)/viewZoom;
@@ -111,10 +138,14 @@ function createView(id,color){
  if(!rig)rig={x:cx,z:cz,half:desiredHalf};
  const blend=window.matchMedia('(prefers-reduced-motion: reduce)').matches?1:1-Math.exp(-dt/0.22);
  rig.x+=(cx-rig.x)*blend;rig.z+=(cz-rig.z)*blend;rig.half+=(desiredHalf-rig.half)*blend;
- camera.position.set(rig.x+42,68,rig.z+60);camera.lookAt(rig.x,0,rig.z);camera.updateMatrixWorld();
+ orient(rig.x,rig.z);
  const half=rig.half;
  camera.left=-half*aspect;camera.right=half*aspect;camera.top=half;camera.bottom=-half;camera.updateProjectionMatrix();
- const p=id==='truth'?f.physical:id==='reported'?f.claimed:f.last?.claimed;main.visible=Boolean(p);if(p)main.position.set(p.x,1.1,p.y);reference.visible=id!=='truth'&&(id!=='observed'||$('show-reference').checked);reference.position.set(f.physical.x,1.1,f.physical.y);observer.position.set(f.receiver.x,1.1,f.receiver.y);placeMark(mainMark,p);placeMark(referenceMark,reference.visible?f.physical:null);placeMark(observerMark,f.receiver);renderer.render(scene,camera);}
+ const p=data.main;main.visible=Boolean(p);if(p)main.position.set(p.x,1.1,p.y);
+ reference.visible=Boolean(data.reference);if(data.reference)reference.position.set(data.reference.x,1.1,data.reference.y);
+ observer.position.set(data.observer.x,1.1,data.observer.y);
+ placeMark(mainMark,p);placeMark(referenceMark,data.reference);placeMark(observerMark,data.observer);renderer.render(scene,camera);}
+
  new ResizeObserver(resize).observe(target);resize();return render;
 }
 function draw(renderViews=true){
