@@ -82,6 +82,15 @@ function storyInsight(f){
  $('story-insight').replaceChildren(...[title,evidence,held,tr('Sai phân giống nhau không xác nhận vị trí đúng.','Matching differences do not establish position correctness.')].map((value,i)=>{const el=document.createElement(i===0?'strong':'span');el.textContent=value;return el;}));
  for(const b of document.querySelectorAll('[data-story]')){const [p,t]=storyStops[b.dataset.story];b.setAttribute('aria-pressed',String(selectedPreset===p&&time===t));}
 }
+function metricGroup(title,rows,note=''){
+ const section=document.createElement('section');section.className='metric-group';
+ const heading=document.createElement('h4');heading.textContent=title;section.appendChild(heading);
+ const list=document.createElement('dl');list.className='metric-grid';
+ for(const [label,value] of rows){const item=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;item.append(dt,dd);list.appendChild(item);}
+ section.appendChild(list);
+ if(note){const p=document.createElement('p');p.className='metric-note';p.textContent=note;section.appendChild(p);}
+ return section;
+}
 function observationGuide(f){
  const guide=guides[selectedPreset];text('preset-guide',guide?guide[lang==='vi'?0:1]:tr('Tình huống tùy chỉnh: so sánh trước, trong và sau khoảng offset; kiểm tra bản tin nào thực sự đến xe nhận.','Custom scenario: compare before, inside and after the offset interval; check which messages actually reach the receiver.'));
  for(const b of document.querySelectorAll('[data-preset]'))b.setAttribute('aria-pressed',String(b.dataset.preset===selectedPreset));
@@ -92,12 +101,11 @@ function observationGuide(f){
  $('timeline-cursor').style.left=`${time/config.duration*100}%`;
  text('jump-start',`${tr('Biên đầu','Start boundary')}: ${config.start} s`);text('jump-end',`${tr('Biên cuối','End boundary')}: ${config.end} s`);
  text('interval-state',!nonzero?tr('Offset bằng 0: hai mốc không tạo bước nhảy vị trí.','Zero offset: these boundaries cause no position jump.'):active(config,time)?tr('Đang trong khoảng offset [bắt đầu, kết thúc).','Inside the offset interval [start, end).'):tr('Đang ngoài khoảng offset.','Outside the offset interval.'));
- const lines=[];
- if(f.last){lines.push(`${tr('Bản tin đang giữ','Held message')}: ${f.last.id}; ${tr('phát','sent')} ${f.last.sent.toFixed(2)} s; ${tr('nhận','arrived')} ${f.last.received.toFixed(2)} s`);lines.push(`${tr('Tuổi dữ liệu tính từ lúc phát','Data age since transmission')}: ${(time-f.last.sent).toFixed(2)} s`);}
- const pair=f.received.slice(-2);
- if(pair.length===2){const [a,b]=pair;lines.push(`${tr('Cặp đã nhận','Received pair')}: ${a.id} → ${b.id}`);lines.push(`Δp′ = ${point({x:b.claimed.x-a.claimed.x,y:b.claimed.y-a.claimed.y})}; Δt (${tr('phát','sent')}) = ${(b.sent-a.sent).toFixed(2)} s`);lines.push(b.sent-a.sent>1?tr('Cặp này cách nhau hơn 1 s do bỏ bản tin; không so trực tiếp với sai phân hai bản tin phát liền nhau.','This pair spans more than 1 s due to omissions; do not directly compare it with consecutive-sent-message differences.'):tr('Kiểm tra mốc phát của hai cặp trước khi so sánh sai phân phía phát và phía nhận.','Check both pairs’ send times before comparing sender and receiver differences.'));}
- else lines.push(tr('Chưa có đủ hai bản tin đã nhận.','Fewer than two messages have arrived.'));
- $('receiver-checks').replaceChildren(...lines.map(value=>{const p=document.createElement('p');p.textContent=value;return p;}));
+ const held=f.last;
+ const heldRows=held?[[tr('ID đang giữ','Held ID'),held.id],[tr('Tuổi từ lúc phát','Age since sent'),`${(time-held.sent).toFixed(2)} s`],[tr('Phát lúc','Sent at'),`${held.sent.toFixed(2)} s`],[tr('Nhận lúc','Arrived at'),`${held.received.toFixed(2)} s`]]:[];
+ const pair=f.received.slice(-2),rows=[];let note=tr('Chưa đủ hai bản tin đã nhận.','Fewer than two messages have arrived.');
+ if(pair.length===2){const [a,b]=pair;rows.push([tr('Cặp ID','Message pair'),`${a.id} → ${b.id}`],[tr('Mốc phát của cặp','Pair send times'),`${a.sent.toFixed(2)} → ${b.sent.toFixed(2)} s`],[tr('Sai phân khai báo Δp′','Claim difference Δp′'),point({x:b.claimed.x-a.claimed.x,y:b.claimed.y-a.claimed.y})],[tr('Khoảng phát Δt','Send-time gap Δt'),`${(b.sent-a.sent).toFixed(2)} s`]);note=b.sent-a.sent>1?tr('Cặp nhận cách nhau hơn 1 s do bỏ bản tin. Đây không phải cặp phát liên tiếp.','Received samples span more than 1 s due to omissions; this is not a consecutive sent pair.'):tr('Đối chiếu mốc phát trước khi so sánh hai phía.','Match send times before comparing the two sides.');}
+ $('receiver-checks').replaceChildren(metricGroup(tr('Bản tin B đang giữ','Message held by B'),heldRows,held?'':tr('B chưa nhận bản tin.','B has not received a message.')),metricGroup(tr('Cặp dùng để so sánh','Comparison pair'),rows,note));
 }
 function drawCommunication(f){
  const c=communication(f),sent=c.latestSent,held=c.held;
@@ -204,9 +212,10 @@ function draw(renderViews=true){
  text('focus-scope',$('focus-mode').value==='receiver'?tr('Chỉ B và bản tin đã tới; không dùng vị trí thật hay khai báo chưa nhận để căn camera.','Only B and arrived claims; framing excludes ground truth and unreceived claims.'):tr('Góc nhìn người phân tích — B không được cung cấp vị trí thật A. Đường nối chỉ đo khoảng cách, không phải đường xe chạy.','Analyst view — B is not supplied with true position A. The connector measures distance, not a driven route.'));
  text('focus-readout',`${focused.measure?`${focused.measure.label}: ${focused.measure.distance.toFixed(2)} m · `:''}${focused.main?`R: ${point(focused.main)} · ${focused.id} · ${tr('tuổi từ lúc phát','age since sent')} ${focused.age.toFixed(2)} s`:tr('Chưa có bản tin: chưa có dấu R.','No message yet: no R marker.')}`);
  text('truth-value',`A: ${point(f.physical)}`);text('reported-value',`A′: ${point(f.claimed)}`);text('observed-value',f.last?`${point(f.last.claimed)} · ${tr('từ lúc phát','since sent')} ${(time-f.last.sent).toFixed(2)} s · ${tr('từ lúc nhận','since arrival')} ${f.age.toFixed(2)} s`:tr('Chưa nhận bản tin','No message received'));
- const lines=[`${tr('Độ lệch đang áp dụng','Applied offset')}: ${active(config,time)?point({x:config.dx,y:config.dy}):'(0, 0) m'}`,`${tr('Xe nhận B','Receiver B')}: ${point(f.receiver)}`];
- if(f.displacement){const d=f.displacement;lines.push(`${tr('Cặp đã phát','Sent pair')}: ${f.sent.at(-2).sent.toFixed(2)} s → ${f.sent.at(-1).sent.toFixed(2)} s`);lines.push(`Δp = ${point(d.physical)}; Δp′ = ${point(d.claimed)}`);lines.push(d.sameOffset?tr('Cùng đoạn: độ lệch triệt tiêu trong sai phân.','Same segment: offset cancels in position differences.'):tr('Biên bật/tắt: sai phân chứa bước nhảy độ lệch.','Onset/termination: differences include an offset jump.'));}else lines.push(tr('Cần hai bản tin đã phát để so sánh sai phân.','Two sent messages are needed to compare differences.'));
- $('checks').replaceChildren(...lines.map(line=>{const p=document.createElement('p');p.className='checks-row';p.textContent=line;return p;}));
+ const rows=[[tr('Độ lệch hiện tại','Current offset'),active(config,time)?point({x:config.dx,y:config.dy}):point({x:0,y:0})],[tr('Vị trí xe B','Vehicle B position'),point(f.receiver)]];
+ let note=tr('Cần hai bản tin phát để tính sai phân.','Two sent messages are needed for differences.');
+ if(f.displacement){const d=f.displacement;rows.push([tr('Cặp ID','Message pair'),`${f.sent.at(-2).id} → ${f.sent.at(-1).id}`],[tr('Mốc phát của cặp','Pair send times'),`${f.sent.at(-2).sent.toFixed(2)} → ${f.sent.at(-1).sent.toFixed(2)} s`],[tr('Sai phân thật Δp','True difference Δp'),point(d.physical)],[tr('Sai phân khai báo Δp′','Claim difference Δp′'),point(d.claimed)]);note=d.sameOffset?tr('Cùng đoạn: sai phân bằng nhau. Điều này không xác nhận vị trí đúng.','Same segment: differences match. This does not establish correct position.'):tr('Cặp qua biên offset: sai phân có bước nhảy.','Pair crosses an offset boundary: differences jump.');}
+ $('checks').replaceChildren(metricGroup(tr('Cặp phát liên tiếp','Consecutive sent pair'),rows,note));
  text('counts',`${tr('Đã phát','Sent')}: ${f.sent.length} · ${tr('Đã nhận','Received')}: ${f.received.length}`);
  $('messages').replaceChildren(...f.sent.slice(-6).reverse().map(m=>{const row=document.createElement('tr'),arrived=m.received!==null&&m.received<=time;const state=m.received===null?tr('Bỏ theo cấu hình','Omitted by configuration'):arrived?tr('Đã nhận','Received'):tr('Đang chờ','Pending');for(const value of [m.id,m.sent.toFixed(2),arrived?m.received.toFixed(2):'—',state]){const cell=document.createElement('td');cell.textContent=value;row.appendChild(cell);}return row;}));
  if(renderViews)for(const render of views)render(f);

@@ -149,3 +149,13 @@ were exercised (375 px document width, no horizontal document overflow).
 A desktop screenshot showed separated A/A′/R/B labels even when positions
 coincided. This does not establish label separation for every arbitrary camera,
 zoom or configuration. Physical devices and frame-rate benchmarks remain untested.
+
+## Geometry readout layout — 2026-10-12
+
+The readouts now use labeled definition-list cards for the consecutive sent
+pair, held message and received comparison pair. In-app browser checks in
+Vietnamese and English confirmed baseline values and impaired 7 s: held demo-7,
+age 1 s, received send-time pair 4→6 s, difference 14 m, interval 2 s.
+The sender pair remained 6→7 s with difference 3 m. No console error was
+captured. Interpretation details are collapsed; per-pair notes remain visible.
+This is a presentation change; model and export formats are unchanged.
