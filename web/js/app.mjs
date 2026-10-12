@@ -2,11 +2,11 @@ import * as THREE from '../vendor/three/three.module.js';
 import {defaults,validate,frame,messages,active} from './scenario.mjs';
 import {createReport,reportMarkdown,toolVersion} from './report.mjs';
 import {presets} from './presets.mjs';
-import {viewData} from './view-data.mjs';
+import {viewData,focusData} from './view-data.mjs';
 import {communication} from './communication.mjs';
 const $=id=>document.getElementById(id);
 let config={...presets.baseline},time=6.5,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1,settleUntil=0,lastReadout=0;
-let selectedPreset='baseline';
+let selectedPreset='baseline',focusTopic='sampling';
 const tr=(vi,en)=>lang==='vi'?vi:en;
 const point=p=>p?`(${p.x.toFixed(2)}, ${p.y.toFixed(2)}) m`:'—';
 function text(id,value){$(id).textContent=value;}
@@ -36,6 +36,8 @@ $('zoom-in').onclick=()=>setZoom(viewZoom+0.25);
 $('zoom-out').onclick=()=>setZoom(viewZoom-0.25);
 $('fit-view').onclick=()=>setZoom(1);
 $('camera-mode').onchange=()=>draw();
+$('focus-mode').onchange=()=>draw();
+$('detail-views').ontoggle=()=>draw();
 $('show-trails').onchange=()=>draw();
 for(const button of document.querySelectorAll('.expand-view'))button.onclick=()=>{
  const card=button.closest('article'),expand=!card.classList.contains('expanded');
@@ -59,7 +61,7 @@ $('jump-start').onclick=()=>seek(config.start);
 $('jump-middle').onclick=()=>seek((config.start+config.end)/2);
 $('jump-end').onclick=()=>seek(config.end);
 const storyStops={sampling:['baseline',6.5],offset:['offset',10],delivery:['impaired',7]};
-function storyStop(key){const [preset,t]=storyStops[key];apply(presets[preset]);time=t;draw();$('story').scrollIntoView({block:'start'});}
+function storyStop(key){focusTopic=key;$('focus-mode').value=key==='delivery'?'receiver':'compare';const [preset,t]=storyStops[key];apply(presets[preset]);time=t;draw();$('story').scrollIntoView({block:'start'});}
 $('start-story').onclick=()=>storyStop('offset');
 for(const b of document.querySelectorAll('[data-story]'))b.onclick=()=>storyStop(b.dataset.story);
 $('take-scenario').onclick=()=>download('v2x-synthetic-scenario.json',config);
@@ -119,15 +121,20 @@ function createView(id,color){
  const roadMaterial=new THREE.MeshBasicMaterial({color:0x263849});
  for(const [x,z] of [[100,7],[7,100]]){const road=new THREE.Mesh(new THREE.PlaneGeometry(x,z),roadMaterial);road.rotation.x=-Math.PI/2;road.position.y=.02;scene.add(road);}
  function box(c,wire=false){const mesh=new THREE.Mesh(new THREE.BoxGeometry(4,1.8,2.2),new THREE.MeshStandardMaterial({color:c,wireframe:wire}));mesh.position.y=1.1;scene.add(mesh);return mesh;}
- const main=box(color),observer=box(0x7eafff),reference=box(0x67e8c3,true);observer.rotation.y=Math.PI/2;
+ const isFocus=id==='focus';
+ const main=isFocus?new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,.4,24),new THREE.MeshBasicMaterial({color})):box(color);if(isFocus)scene.add(main);
+ const observer=box(0x7eafff),reference=box(0x67e8c3,!isFocus);
+ const claimMesh=isFocus?box(0xffc477,true):null;observer.rotation.y=Math.PI/2;
  function marker(label,color,radius,offset){
   const ring=new THREE.Mesh(new THREE.RingGeometry(radius-.10,radius,64),new THREE.MeshBasicMaterial({color,side:THREE.DoubleSide,depthWrite:false}));
   ring.rotation.x=-Math.PI/2;ring.position.y=.10;scene.add(ring);
   const tag=document.createElement('span');tag.className='position-tag';tag.textContent=label;tag.style.color='#'+color.toString(16).padStart(6,'0');target.appendChild(tag);
   return {ring,tag,offset};
  }
- const mainMark=marker(id==='truth'?'A':'A′',color,id==='truth'?2.8:3.5,id==='truth'?-38:38);
+ const mainMark=marker(isFocus?'R':id==='truth'?'A':'A′',color,id==='truth'?2.8:3.5,isFocus?85:id==='truth'?-38:38);
  const referenceMark=marker('A',0x67e8c3,2.8,-38),observerMark=marker('B',0x7eafff,4.2,0);
+ const claimMark=isFocus?marker('A′',0xffc477,4.8,60):null;
+ const measureLine=isFocus?new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0xe2edf5})):null;if(measureLine)scene.add(measureLine);
  function historyMark(color){
   const geometry=new THREE.BufferGeometry();
   const line=new THREE.Line(geometry,new THREE.LineDashedMaterial({color,dashSize:.65,gapSize:.45,transparent:true,opacity:.85}));
@@ -152,16 +159,17 @@ function createView(id,color){
   mark.ring.position.set(p.x,.10,p.y);
   const v=new THREE.Vector3(p.x,3,p.y).project(camera);
   mark.tag.hidden=Math.abs(v.x)>1||Math.abs(v.y)>1;
-  mark.tag.style.left=`${(v.x+1)*target.clientWidth/2+mark.offset}px`;
-  mark.tag.style.top=`${(1-v.y)*target.clientHeight/2-(mark===observerMark?30:8)}px`;
+  mark.tag.style.left=`${Math.max(mark.tag.offsetWidth/2+4,Math.min(target.clientWidth-mark.tag.offsetWidth/2-4,(v.x+1)*target.clientWidth/2+mark.offset))}px`;
+  mark.tag.style.top=`${(1-v.y)*target.clientHeight/2-(isFocus?(mark===observerMark?72:mark===mainMark?-38:mark===claimMark?38:8):(mark===observerMark?30:8))}px`;
  }
  function resize(){const {width,height}=target.getBoundingClientRect();if(!width||!height)return;renderer.setSize(width,height);aspect=width/height;settleUntil=performance.now()+1800;render(frame(config,time));}
  function render(f){
- const scope=[$('camera-mode').value,$('show-trails').checked,$('show-reference').checked].join(':');
+ if(!target.clientWidth||!target.clientHeight)return;
+ const scope=[$('camera-mode').value,$('show-trails').checked,$('show-reference').checked,$('focus-mode').value,focusTopic].join(':');
  // Drop camera memory when the visible information changes or time rewinds.
  if(previousConfig!==config||previousScope!==scope||(previousTime!==null&&f.time<previousTime))rig=null;
  previousConfig=config;previousScope=scope;previousTime=f.time;
- const data=viewData(id,f,{trails:$('show-trails').checked,reference:$('show-reference').checked});
+ const data=isFocus?focusData(f,{receiverOnly:$('focus-mode').value==='receiver',trails:$('show-trails').checked,focus:focusTopic}):viewData(id,f,{trails:$('show-trails').checked,reference:$('show-reference').checked});
  const points=data.framing;
  updateHistory(trailMark,data.trail);updateHistory(referenceHistory,data.referenceTrail);
  const xs=points.map(p=>p.x),zs=points.map(p=>p.y);
@@ -180,6 +188,11 @@ function createView(id,color){
  const p=data.main;main.visible=Boolean(p);if(p)main.position.set(p.x,1.1,p.y);
  reference.visible=Boolean(data.reference);if(data.reference)reference.position.set(data.reference.x,1.1,data.reference.y);
  observer.position.set(data.observer.x,1.1,data.observer.y);
+ if(isFocus){
+  mainMark.tag.textContent=data.main?`R · ${tr('tuổi','age')} ${data.age.toFixed(2)} s`: 'R';
+  claimMesh.visible=Boolean(data.claim);if(data.claim)claimMesh.position.set(data.claim.x,1.1,data.claim.y);placeMark(claimMark,data.claim);
+  measureLine.visible=Boolean(data.measure);if(data.measure){measureLine.geometry.dispose();measureLine.geometry=new THREE.BufferGeometry().setFromPoints([data.measure.from,data.measure.to].map(p=>new THREE.Vector3(p.x,.45,p.y)));}
+ }
  placeMark(mainMark,p);placeMark(referenceMark,data.reference);placeMark(observerMark,data.observer);renderer.render(scene,camera);}
 
  new ResizeObserver(resize).observe(target);resize();return render;
@@ -187,6 +200,9 @@ function createView(id,color){
 function draw(renderViews=true){
  settleUntil=performance.now()+1800;
  const f=frame(config,time);observationGuide(f);storyInsight(f);drawCommunication(f);$('time').value=time;text('time-value',`${time.toFixed(2)} s`);text('play',playing?tr('Tạm dừng','Pause'):tr('Phát','Play'));
+ const focused=focusData(f,{receiverOnly:$('focus-mode').value==='receiver',focus:focusTopic});
+ text('focus-scope',$('focus-mode').value==='receiver'?tr('Chỉ B và bản tin đã tới; không dùng vị trí thật hay khai báo chưa nhận để căn camera.','Only B and arrived claims; framing excludes ground truth and unreceived claims.'):tr('Góc nhìn người phân tích — B không được cung cấp vị trí thật A. Đường nối chỉ đo khoảng cách, không phải đường xe chạy.','Analyst view — B is not supplied with true position A. The connector measures distance, not a driven route.'));
+ text('focus-readout',`${focused.measure?`${focused.measure.label}: ${focused.measure.distance.toFixed(2)} m · `:''}${focused.main?`R: ${point(focused.main)} · ${focused.id} · ${tr('tuổi từ lúc phát','age since sent')} ${focused.age.toFixed(2)} s`:tr('Chưa có bản tin: chưa có dấu R.','No message yet: no R marker.')}`);
  text('truth-value',`A: ${point(f.physical)}`);text('reported-value',`A′: ${point(f.claimed)}`);text('observed-value',f.last?`${point(f.last.claimed)} · ${tr('từ lúc phát','since sent')} ${(time-f.last.sent).toFixed(2)} s · ${tr('từ lúc nhận','since arrival')} ${f.age.toFixed(2)} s`:tr('Chưa nhận bản tin','No message received'));
  const lines=[`${tr('Độ lệch đang áp dụng','Applied offset')}: ${active(config,time)?point({x:config.dx,y:config.dy}):'(0, 0) m'}`,`${tr('Xe nhận B','Receiver B')}: ${point(f.receiver)}`];
  if(f.displacement){const d=f.displacement;lines.push(`${tr('Cặp đã phát','Sent pair')}: ${f.sent.at(-2).sent.toFixed(2)} s → ${f.sent.at(-1).sent.toFixed(2)} s`);lines.push(`Δp = ${point(d.physical)}; Δp′ = ${point(d.claimed)}`);lines.push(d.sameOffset?tr('Cùng đoạn: độ lệch triệt tiêu trong sai phân.','Same segment: offset cancels in position differences.'):tr('Biên bật/tắt: sai phân chứa bước nhảy độ lệch.','Onset/termination: differences include an offset jump.'));}else lines.push(tr('Cần hai bản tin đã phát để so sánh sai phân.','Two sent messages are needed to compare differences.'));
@@ -196,7 +212,7 @@ function draw(renderViews=true){
  if(renderViews)for(const render of views)render(f);
 }
 translate();fill();
-try{views=[createView('truth',0x67e8c3),createView('reported',0xffc477),createView('observed',0xffc477)];}catch{for(const el of document.querySelectorAll('.viewport'))el.replaceChildren();text('render-status','WebGL unavailable. Coordinate readouts and message exploration remain usable.');}
+try{views=[createView('focus',0xd7a8ff),createView('truth',0x67e8c3),createView('reported',0xffc477),createView('observed',0xffc477)];}catch{for(const el of document.querySelectorAll('.viewport'))el.replaceChildren();text('render-status','WebGL unavailable. Coordinate readouts and message exploration remain usable.');}
 draw();
 function tick(now){
  if(playing){

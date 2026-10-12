@@ -26,6 +26,16 @@ A WebGL-capable browser enables 3D; coordinate and message tables work without i
 
 ## Explore
 
+The main scene offers **Simulation-wide comparison** and **Receiver-only**.
+A is the synthetic true vehicle, A′ is a hollow current-claim marker, R is a
+solid retained-position marker, and B is the receiver vehicle. R is not B's
+location. Its age is time since transmission, so a packet arriving after 1 s
+already has age 1 s. With no arrival, R is absent. In comparison mode the
+connector measures A–R at the sampling stop and A–A′ at the offset stop; it
+is not a driven path or collision indicator. Receiver-only excludes ground truth,
+unreceived claims and comparison measurements from geometry and camera framing.
+The three original panes remain available under **Detailed comparison**.
+
 Start with **Explore the 30-second walkthrough**. Three stops show sampling at
 6.5 s, equal differences despite an 8 m offset at 10 s, and delayed information
 at 7 s. Evidence appears above the scene. Advanced settings, camera controls and

@@ -17,3 +17,17 @@ export function viewData(id,f,{trails=true,reference=false}={}){
  return {main,observer,reference:referencePoint,trail,referenceTrail,
   framing:[observer,...(main?[main]:[]),...(referencePoint?[referencePoint]:[]),...trail,...referenceTrail]};
 }
+
+// Receiver mode is selected before reading any remote truth/current claim.
+export function focusData(f,{receiverOnly=false,trails=false,focus='offset'}={}){
+ const received=f.received.map(m=>({...m.claimed}));
+ const main=f.last?{...f.last.claimed}:null,observer={...f.receiver};
+ const reference=receiverOnly?null:{...f.physical};
+ const claim=receiverOnly?null:{...f.claimed};
+ const trail=trails?received:[];
+ const endpoint=focus==='sampling'?main:claim;
+ const measure=reference&&endpoint?{from:reference,to:endpoint,distance:Math.hypot(reference.x-endpoint.x,reference.y-endpoint.y),label:focus==='sampling'?'A ↔ R':'A ↔ A′'}:null;
+ return {main,observer,reference,claim,trail,referenceTrail:[],measure,
+  age:f.last?f.time-f.last.sent:null,id:f.last?.id??null,
+  framing:[observer,...(main?[main]:[]),...(reference?[reference]:[]),...(claim?[claim]:[]),...trail]};
+}

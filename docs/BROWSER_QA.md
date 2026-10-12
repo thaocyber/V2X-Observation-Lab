@@ -135,3 +135,17 @@ OPEN QUESTION: this is one expert walkthrough, not a study with independent
 participants. No physical phone, frame-rate benchmark, measured 30-second task
 completion, or standalone browser matrix was tested. The apex domain did not
 resolve in this session; the V2X subdomain did. DNS was not modified.
+
+## Focused comparison — 2026-10-12
+
+VERIFIED FACT: 17 automated tests pass, including receiver-only invariance to
+hidden truth/current claims, no-arrival state, transmission-age semantics,
+rewind and unchanged exports. In the in-app browser the sampling stop showed
+A–R = 1.50 m and age 0.50 s; the offset stop showed A–A′ = 8.00 m; the delivery
+stop selected receiver-only and showed only B and R, with age 1.00 s. Reset in
+that mode removed R before any arrival. Opening the original three panes worked;
+no console error was captured. English labels and an emulated 390 px viewport
+were exercised (375 px document width, no horizontal document overflow).
+A desktop screenshot showed separated A/A′/R/B labels even when positions
+coincided. This does not establish label separation for every arbitrary camera,
+zoom or configuration. Physical devices and frame-rate benchmarks remain untested.

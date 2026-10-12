@@ -17,3 +17,7 @@ main{max-width:1800px;padding-left:3%;padding-right:3%}.viewport{height:360px}.c
 .playback{position:static}.intro .eyebrow{margin:0}.camera-controls{gap:8px}.camera-controls button{padding:6px 10px}.views .viewport{height:220px}
 
 .camera-options{margin:8px 0}.take-link{font-size:.85rem}.history-legend{font-size:.8rem}.reading{font-size:.8rem}
+
+.focused-view .toolbar{margin-top:0}.focused-view .viewport{height:400px}.focus-legend{font-size:.8rem;color:var(--muted)}#focus-scope{font-size:.85rem}#focus-readout{font-variant-numeric:tabular-nums}#detail-views>.views{margin-top:16px}@media(max-width:700px){.focused-view .viewport{height:330px}#focus .position-tag{font-size:11px;padding:1px 4px}}
+
+.legend-retained{color:#d7a8ff}
