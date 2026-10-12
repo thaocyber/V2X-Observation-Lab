@@ -26,6 +26,13 @@ A WebGL-capable browser enables 3D; coordinate and message tables work without i
 
 ## Explore
 
+The current V2X scenario is one-way V2V: vehicle A sends a position claim and
+vehicle B holds the latest arrival. The communication panel shows sent, pending,
+configured-omission and received counts from the existing synthetic schedule.
+Expand its event log to inspect send/omit/receive events up to playback time.
+This is a simulation-wide teaching view: B does not know configured omissions.
+There is no radio link, acknowledgement exchange, RSU or CAM/BSM wire encoding.
+
 Start with a one-click preset: no offset, constant offset, or offset with delay
 and periodic omissions. Each includes a guided observation. Timeline buttons
 seek to the applied start, middle and end; start is inclusive and end exclusive.

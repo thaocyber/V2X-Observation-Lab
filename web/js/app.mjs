@@ -3,6 +3,7 @@ import {defaults,validate,frame,messages,active} from './scenario.mjs';
 import {createReport,reportMarkdown,toolVersion} from './report.mjs';
 import {presets} from './presets.mjs';
 import {viewData} from './view-data.mjs';
+import {communication} from './communication.mjs';
 const $=id=>document.getElementById(id);
 let config={...defaults},time=0,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1,settleUntil=0,lastReadout=0;
 let selectedPreset=null;
@@ -73,6 +74,19 @@ function observationGuide(f){
  if(pair.length===2){const [a,b]=pair;lines.push(`${tr('Cặp đã nhận','Received pair')}: ${a.id} → ${b.id}`);lines.push(`Δp′ = ${point({x:b.claimed.x-a.claimed.x,y:b.claimed.y-a.claimed.y})}; Δt (${tr('phát','sent')}) = ${(b.sent-a.sent).toFixed(2)} s`);lines.push(b.sent-a.sent>1?tr('Cặp này cách nhau hơn 1 s do bỏ bản tin; không so trực tiếp với sai phân hai bản tin phát liền nhau.','This pair spans more than 1 s due to omissions; do not directly compare it with consecutive-sent-message differences.'):tr('Kiểm tra mốc phát của hai cặp trước khi so sánh sai phân phía phát và phía nhận.','Check both pairs’ send times before comparing sender and receiver differences.'));}
  else lines.push(tr('Chưa có đủ hai bản tin đã nhận.','Fewer than two messages have arrived.'));
  $('receiver-checks').replaceChildren(...lines.map(value=>{const p=document.createElement('p');p.textContent=value;return p;}));
+}
+function drawCommunication(f){
+ const c=communication(f),sent=c.latestSent,held=c.held;
+ text('flow-sent',`${tr('Đã phát','Sent')}: ${c.sent} · ${sent?`${sent.id} @ ${sent.sent.toFixed(2)} s · A′ ${point(sent.claimed)}`:'—'}`);
+ text('flow-channel',`${tr('Đang chờ','Pending')}: ${c.pending} · ${tr('Bỏ theo cấu hình','Configured omissions')}: ${c.omitted}`);
+ text('flow-received',`${tr('Đã nhận','Received')}: ${c.received} · ${held?`${held.id} · A′ ${point(held.claimed)} · ${tr('tuổi dữ liệu','data age')} ${(f.time-held.sent).toFixed(2)} s`:tr('Chưa có bản tin','No message yet')}`);
+ text('event-count',`${tr('Tổng sự kiện','Total events')}: ${c.events.length} · ${tr('Mới nhất trước','Newest first')}`);
+ const labels={sent:tr('A phát','A sends'),omitted:tr('Bỏ theo cấu hình','Omitted by configuration'),received:tr('B nhận','B receives')};
+ $('communication-events').replaceChildren(...c.events.slice().reverse().map(e=>{
+  const row=document.createElement('tr');
+  for(const value of [e.time.toFixed(2),e.id,labels[e.kind]]){const cell=document.createElement('td');cell.textContent=value;row.appendChild(cell);}
+  return row;
+ }));
 }
 function createView(id,color){
  const target=$(id),scene=new THREE.Scene();scene.background=new THREE.Color('#0d1827');
@@ -150,7 +164,7 @@ function createView(id,color){
 }
 function draw(renderViews=true){
  settleUntil=performance.now()+1800;
- const f=frame(config,time);observationGuide(f);$('time').value=time;text('time-value',`${time.toFixed(2)} s`);text('play',playing?tr('Tạm dừng','Pause'):tr('Phát','Play'));
+ const f=frame(config,time);observationGuide(f);drawCommunication(f);$('time').value=time;text('time-value',`${time.toFixed(2)} s`);text('play',playing?tr('Tạm dừng','Pause'):tr('Phát','Play'));
  text('truth-value',`A: ${point(f.physical)}`);text('reported-value',`A′: ${point(f.claimed)}`);text('observed-value',f.last?`${point(f.last.claimed)} · ${tr('tuổi tiếp nhận','reception age')} ${f.age.toFixed(2)} s`:tr('Chưa nhận bản tin','No message received'));
  const lines=[`${tr('Độ lệch đang áp dụng','Applied offset')}: ${active(config,time)?point({x:config.dx,y:config.dy}):'(0, 0) m'}`,`${tr('Xe nhận B','Receiver B')}: ${point(f.receiver)}`];
  if(f.displacement){const d=f.displacement;lines.push(`${tr('Cặp đã phát','Sent pair')}: ${f.sent.at(-2).sent.toFixed(2)} s → ${f.sent.at(-1).sent.toFixed(2)} s`);lines.push(`Δp = ${point(d.physical)}; Δp′ = ${point(d.claimed)}`);lines.push(d.sameOffset?tr('Cùng đoạn: độ lệch triệt tiêu trong sai phân.','Same segment: offset cancels in position differences.'):tr('Biên bật/tắt: sai phân chứa bước nhảy độ lệch.','Onset/termination: differences include an offset jump.'));}else lines.push(tr('Cần hai bản tin đã phát để so sánh sai phân.','Two sent messages are needed to compare differences.'));

@@ -2,6 +2,7 @@
 
 ## Unreleased — 0.2.0 development
 
+- One-way V2V flow and collapsible send/omit/receive log derived from the existing schedule. No model or export-schema change.
 - Oblique/top-down camera selection and optional position histories.
 - Bilingual sample/line legend distinguishing truth, claims and the receiver.
 - Receiver trails and camera framing use arrived claims only, unless the explicit

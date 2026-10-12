@@ -9,3 +9,5 @@ main{max-width:1800px;padding-left:3%;padding-right:3%}.viewport{height:360px}.c
 .history-legend{display:flex;flex-wrap:wrap;gap:12px 24px;font-size:.9rem}.history-legend span::before{content:'● ┄ ';font-weight:bold}.legend-truth{color:var(--mint)}.legend-claim{color:var(--gold)}.legend-receiver{color:#7eafff}.camera-controls label{margin:0}.camera-controls .reference-toggle{font-size:.85rem}.camera-controls select{min-width:150px}
 
 .history-legend .legend-receiver::before{content:'● ';}
+
+.communication-flow{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center}.flow-node{border:1px solid var(--line);border-radius:10px;padding:14px;overflow-wrap:anywhere}.flow-node h3{margin:0;color:var(--mint)}.flow-node:last-child h3{color:#7eafff}.flow-node p{margin-bottom:0;font-variant-numeric:tabular-nums}.flow-arrow{color:var(--gold);font-size:1.5rem}@media(max-width:700px){.communication-flow{grid-template-columns:1fr}.flow-arrow{transform:rotate(90deg);justify-self:center}}

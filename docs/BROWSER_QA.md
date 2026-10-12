@@ -25,8 +25,7 @@ Standalone Chrome/Firefox, physical mobile devices, frame-rate measurements and
 accessibility certification remain untested. Browser automation timed out on the
 semantic Fit button click; a direct visible-button click was used instead.
 These checks establish neither detector effectiveness nor real-vehicle behavior.
-The new event-log feature and a final three-page submission PDF are not included
-in this display increment. The published v0.1.0 archives are unchanged.
+The final three-page submission PDF is not included in this display increment. The published v0.1.0 archives are unchanged.
 
 ---
 
@@ -101,3 +100,16 @@ The workflow passed for commit `331f1d7` after the public manifest was refreshed
 [GitHub Actions run](https://github.com/thaocyber/V2X-Observation-Lab/actions/runs/38152456419).
 That result applies to that commit, not automatically to later changes.
 See [the release checklist](RELEASE_CHECKLIST.md) for packaging context.
+
+## V2V communication panel increment — 2026-10-12
+
+VERIFIED FACT: the automated suite now has 15 passing tests. Added checks cover
+count partitioning, no future receive events, configured omissions, zero-delay
+send/receive ordering, rewind and unchanged reproduction reports. At impaired
+7 s: 8 sent = 1 pending + 2 omitted + 5 received; B holds demo-7 while A has
+sent demo-8. The scenario model and export schema are unchanged.
+
+OPEN QUESTION: browser automation timed out opening and selecting the local
+preview for this increment. Visual layout and bilingual interaction for the new
+panel have not been verified in-browser. Earlier browser checks above apply to
+the previous display increment, not this panel. No frame-rate claim is made.
