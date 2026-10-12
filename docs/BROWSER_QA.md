@@ -113,3 +113,25 @@ OPEN QUESTION: browser automation timed out opening and selecting the local
 preview for this increment. Visual layout and bilingual interaction for the new
 panel have not been verified in-browser. Earlier browser checks above apply to
 the previous display increment, not this panel. No frame-rate claim is made.
+
+## Guided first-time walkthrough — 2026-10-12
+
+VERIFIED FACT: in the in-app browser, the introductory action selected the
+8 m offset preset at 10 s; the three stops selected baseline 6.5 s, offset 10 s,
+and impaired 7 s. The evidence panel showed matching 3 m sender differences
+at the offset stop and a 1 s data age at the delayed stop. Advanced edits showed
+an explicit warning that the scene retained previous settings. English switching
+and both take-home download buttons were exercised; the downloaded Markdown
+was read and contained the 7 s replay time and held message demo-7.
+
+A desktop screenshot showed evidence, playback and the vehicles together after
+the entry action. The playback bar was moved above the scene after a sticky
+prototype obscured vehicles. At an emulated 390 px viewport, document width was
+375 px (no horizontal overflow); panes stack and require vertical scrolling.
+No console errors were captured during the recorded checks. The camera controls
+are now behind a disclosure. Existing numerical tests cover the unchanged model.
+
+OPEN QUESTION: this is one expert walkthrough, not a study with independent
+participants. No physical phone, frame-rate benchmark, measured 30-second task
+completion, or standalone browser matrix was tested. The apex domain did not
+resolve in this session; the V2X subdomain did. DNS was not modified.

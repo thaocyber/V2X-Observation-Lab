@@ -26,6 +26,14 @@ A WebGL-capable browser enables 3D; coordinate and message tables work without i
 
 ## Explore
 
+Start with **Explore the 30-second walkthrough**. Three stops show sampling at
+6.5 s, equal differences despite an 8 m offset at 10 s, and delayed information
+at 7 s. Evidence appears above the scene. Advanced settings, camera controls and
+longer explanations expand on demand. The initial view uses the baseline at 6.5 s.
+**Take the test with you** downloads the applied scenario and a Markdown guide
+containing the playback time and expected report. Import the scenario through
+advanced settings, then seek to that time; scenario import alone resets time.
+
 The current V2X scenario is one-way V2V: vehicle A sends a position claim and
 vehicle B holds the latest arrival. The communication panel shows sent, pending,
 configured-omission and received counts from the existing synthetic schedule.

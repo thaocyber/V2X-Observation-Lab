@@ -5,8 +5,8 @@ import {presets} from './presets.mjs';
 import {viewData} from './view-data.mjs';
 import {communication} from './communication.mjs';
 const $=id=>document.getElementById(id);
-let config={...defaults},time=0,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1,settleUntil=0,lastReadout=0;
-let selectedPreset=null;
+let config={...presets.baseline},time=6.5,playing=false,lastTick=null,lang='vi',views=[],viewZoom=1,settleUntil=0,lastReadout=0;
+let selectedPreset='baseline';
 const tr=(vi,en)=>lang==='vi'?vi:en;
 const point=p=>p?`(${p.x.toFixed(2)}, ${p.y.toFixed(2)}) m`:'—';
 function text(id,value){$(id).textContent=value;}
@@ -15,7 +15,7 @@ function notice(vi,en){text('notice',tr(vi,en));}
 function apply(value){config=validate(value);selectedPreset=Object.keys(presets).find(k=>Object.keys(config).every(field=>config[field]===presets[k][field]))??null;time=0;playing=false;fill();text('error','');notice('Đã áp dụng kịch bản tổng hợp.','Synthetic scenario applied.');draw();}
 function download(name,value){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)+'\n'],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('config').addEventListener('submit',e=>{e.preventDefault();try{const next={...defaults};for(const key of ['dx','dy','start','end','delay','dropEvery'])next[key]=Number($(key).value);apply(next);}catch(err){text('error',tr('Cấu hình không hợp lệ: ','Invalid configuration: ')+err.message);}});
-$('config').addEventListener('input',e=>{if(e.target.type!=='file')notice('Có thay đổi chưa áp dụng. Xuất JSON dùng cấu hình đã áp dụng.','Unapplied edits. JSON export uses the applied configuration.');});
+$('config').addEventListener('input',e=>{if(e.target.type!=='file')notice('Cảnh vẫn dùng cấu hình cũ. Bấm Áp dụng & về đầu để cập nhật.','The scene still uses the previous settings. Click Apply & reset to update it.');});
 $('defaults').onclick=()=>apply({...defaults});
 $('export').onclick=()=>download('v2x-synthetic-scenario.json',config);
 $('report-json').onclick=()=>download('v2x-observation-report.json',createReport(config,time));
@@ -58,6 +58,28 @@ function seek(t){time=t;playing=false;draw();}
 $('jump-start').onclick=()=>seek(config.start);
 $('jump-middle').onclick=()=>seek((config.start+config.end)/2);
 $('jump-end').onclick=()=>seek(config.end);
+const storyStops={sampling:['baseline',6.5],offset:['offset',10],delivery:['impaired',7]};
+function storyStop(key){const [preset,t]=storyStops[key];apply(presets[preset]);time=t;draw();$('story').scrollIntoView({block:'start'});}
+$('start-story').onclick=()=>storyStop('offset');
+for(const b of document.querySelectorAll('[data-story]'))b.onclick=()=>storyStop(b.dataset.story);
+$('take-scenario').onclick=()=>download('v2x-synthetic-scenario.json',config);
+$('take-guide').onclick=()=>{
+ const report=createReport(config,time);
+ const steps=tr('# Tái hiện tình huống\n\n1. Mở https://v2x.tcybertrust.id.vn/ hoặc bản local.\n2. Mở cấu hình nâng cao, nhập tệp kịch bản đã tải.\n3. Tua tới ', '# Reproduce the scenario\n\n1. Open https://v2x.tcybertrust.id.vn/ or the local bundle.\n2. Open advanced settings and import the downloaded scenario.\n3. Seek to ')+time.toFixed(2)+' s.\n4. '+tr('So sánh với kết quả bên dưới. Camera không ảnh hưởng số liệu.','Compare with the expected results below. Camera settings do not affect values.')+'\n\n'+reportMarkdown(report);
+ const url=URL.createObjectURL(new Blob([steps],{type:'text/markdown;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='v2x-reproduction-guide.md';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+function storyInsight(f){
+ const d=f.displacement,offset=active(config,time)?Math.hypot(config.dx,config.dy):0;
+ let title;
+ if(selectedPreset==='impaired'&&f.last)title=tr(`B đang dùng thông tin phát từ ${(time-f.last.sent).toFixed(2)} giây trước.`,`B is using information sent ${(time-f.last.sent).toFixed(2)} seconds ago.`);
+ else if(d&&d.sameOffset&&offset>0)title=tr(`Lệch ${offset.toFixed(2)} m · sai phân vẫn bằng nhau.`,`Offset ${offset.toFixed(2)} m · position differences still match.`);
+ else if(d&&!d.sameOffset)title=tr('Tại biên offset: sai phân có bước nhảy.','At the offset boundary: position differences jump.');
+ else title=tr('B chỉ biết bản tin đã tới, không biết chuyển động liên tục.','B knows arrived messages, not continuous movement.');
+ const evidence=d?`Δp = ${point(d.physical)} · Δp′ = ${point(d.claimed)}`:tr('Cần hai bản tin phát để tính sai phân.','Two sent messages are needed for differences.');
+ const held=f.last?tr(`B giữ ${f.last.id}: phát ${f.last.sent.toFixed(2)} s, nhận ${f.last.received.toFixed(2)} s; dữ liệu đã ${ (time-f.last.sent).toFixed(2)} s tuổi.`,`B holds ${f.last.id}: sent ${f.last.sent.toFixed(2)} s, arrived ${f.last.received.toFixed(2)} s; data is ${(time-f.last.sent).toFixed(2)} s old.`):tr('B chưa nhận bản tin nào.','B has not received a message yet.');
+ $('story-insight').replaceChildren(...[title,evidence,held,tr('Sai phân giống nhau không xác nhận vị trí đúng.','Matching differences do not establish position correctness.')].map((value,i)=>{const el=document.createElement(i===0?'strong':'span');el.textContent=value;return el;}));
+ for(const b of document.querySelectorAll('[data-story]')){const [p,t]=storyStops[b.dataset.story];b.setAttribute('aria-pressed',String(selectedPreset===p&&time===t));}
+}
 function observationGuide(f){
  const guide=guides[selectedPreset];text('preset-guide',guide?guide[lang==='vi'?0:1]:tr('Tình huống tùy chỉnh: so sánh trước, trong và sau khoảng offset; kiểm tra bản tin nào thực sự đến xe nhận.','Custom scenario: compare before, inside and after the offset interval; check which messages actually reach the receiver.'));
  for(const b of document.querySelectorAll('[data-preset]'))b.setAttribute('aria-pressed',String(b.dataset.preset===selectedPreset));
@@ -164,8 +186,8 @@ function createView(id,color){
 }
 function draw(renderViews=true){
  settleUntil=performance.now()+1800;
- const f=frame(config,time);observationGuide(f);drawCommunication(f);$('time').value=time;text('time-value',`${time.toFixed(2)} s`);text('play',playing?tr('Tạm dừng','Pause'):tr('Phát','Play'));
- text('truth-value',`A: ${point(f.physical)}`);text('reported-value',`A′: ${point(f.claimed)}`);text('observed-value',f.last?`${point(f.last.claimed)} · ${tr('tuổi tiếp nhận','reception age')} ${f.age.toFixed(2)} s`:tr('Chưa nhận bản tin','No message received'));
+ const f=frame(config,time);observationGuide(f);storyInsight(f);drawCommunication(f);$('time').value=time;text('time-value',`${time.toFixed(2)} s`);text('play',playing?tr('Tạm dừng','Pause'):tr('Phát','Play'));
+ text('truth-value',`A: ${point(f.physical)}`);text('reported-value',`A′: ${point(f.claimed)}`);text('observed-value',f.last?`${point(f.last.claimed)} · ${tr('từ lúc phát','since sent')} ${(time-f.last.sent).toFixed(2)} s · ${tr('từ lúc nhận','since arrival')} ${f.age.toFixed(2)} s`:tr('Chưa nhận bản tin','No message received'));
  const lines=[`${tr('Độ lệch đang áp dụng','Applied offset')}: ${active(config,time)?point({x:config.dx,y:config.dy}):'(0, 0) m'}`,`${tr('Xe nhận B','Receiver B')}: ${point(f.receiver)}`];
  if(f.displacement){const d=f.displacement;lines.push(`${tr('Cặp đã phát','Sent pair')}: ${f.sent.at(-2).sent.toFixed(2)} s → ${f.sent.at(-1).sent.toFixed(2)} s`);lines.push(`Δp = ${point(d.physical)}; Δp′ = ${point(d.claimed)}`);lines.push(d.sameOffset?tr('Cùng đoạn: độ lệch triệt tiêu trong sai phân.','Same segment: offset cancels in position differences.'):tr('Biên bật/tắt: sai phân chứa bước nhảy độ lệch.','Onset/termination: differences include an offset jump.'));}else lines.push(tr('Cần hai bản tin đã phát để so sánh sai phân.','Two sent messages are needed to compare differences.'));
  $('checks').replaceChildren(...lines.map(line=>{const p=document.createElement('p');p.className='checks-row';p.textContent=line;return p;}));
