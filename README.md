@@ -11,6 +11,16 @@ documented formulas. There are no learned model scores or measured traces.
 [Bug reports](https://github.com/thaocyber/V2X-Observation-Lab/issues/new/choose) ·
 [Private security reports](https://github.com/thaocyber/V2X-Observation-Lab/security/advisories/new)
 
+## Learning demo
+
+[Create and try a lesson](https://v2x.tcybertrust.id.vn/learn/) (Vietnamese, demo 0.1).
+Compare two worlds with identical receiver messages, predict, then reveal their
+different true positions. Authors can change offset, speed, question and explanation,
+then share a validated lesson JSON. This is one constrained template, not a general
+scenario editor, detector, assessment platform or protocol implementation.
+
+[Step-by-step development plan](docs/LEARNING_ROADMAP.md).
+
 ## Run
 
 From this folder, with Python 3 available:
@@ -28,7 +38,7 @@ A WebGL-capable browser enables 3D; coordinate and message tables work without i
 
 The main scene offers **Simulation-wide comparison** and **Receiver-only**.
 A is the synthetic true vehicle, A′ is a hollow current-claim marker, R is a
-solid retained-position marker, and B is the receiver vehicle. R is not B's
+purple retained-position pin, and B is the receiver vehicle. R is not B's
 location. Its age is time since transmission, so a packet arriving after 1 s
 already has age 1 s. With no arrival, R is absent. In comparison mode the
 connector measures A–R at the sampling stop and A–A′ at the offset stop; it

@@ -73,13 +73,17 @@ $('take-guide').onclick=()=>{
 function storyInsight(f){
  const d=f.displacement,offset=active(config,time)?Math.hypot(config.dx,config.dy):0;
  let title;
- if(selectedPreset==='impaired'&&f.last)title=tr(`B đang dùng thông tin phát từ ${(time-f.last.sent).toFixed(2)} giây trước.`,`B is using information sent ${(time-f.last.sent).toFixed(2)} seconds ago.`);
- else if(d&&d.sameOffset&&offset>0)title=tr(`Lệch ${offset.toFixed(2)} m · sai phân vẫn bằng nhau.`,`Offset ${offset.toFixed(2)} m · position differences still match.`);
- else if(d&&!d.sameOffset)title=tr('Tại biên offset: sai phân có bước nhảy.','At the offset boundary: position differences jump.');
- else title=tr('B chỉ biết bản tin đã tới, không biết chuyển động liên tục.','B knows arrived messages, not continuous movement.');
- const evidence=d?`Δp = ${point(d.physical)} · Δp′ = ${point(d.claimed)}`:tr('Cần hai bản tin phát để tính sai phân.','Two sent messages are needed for differences.');
- const held=f.last?tr(`B giữ ${f.last.id}: phát ${f.last.sent.toFixed(2)} s, nhận ${f.last.received.toFixed(2)} s; dữ liệu đã ${ (time-f.last.sent).toFixed(2)} s tuổi.`,`B holds ${f.last.id}: sent ${f.last.sent.toFixed(2)} s, arrived ${f.last.received.toFixed(2)} s; data is ${(time-f.last.sent).toFixed(2)} s old.`):tr('B chưa nhận bản tin nào.','B has not received a message yet.');
- $('story-insight').replaceChildren(...[title,evidence,held,tr('Sai phân giống nhau không xác nhận vị trí đúng.','Matching differences do not establish position correctness.')].map((value,i)=>{const el=document.createElement(i===0?'strong':'span');el.textContent=value;return el;}));
+ const evidence=d?`Δp = ${point(d.physical)} · Δp′ = ${point(d.claimed)}`:tr('Cần hai lần gửi tin để so sánh.','Two transmissions are needed to compare.');
+ const age=f.last?time-f.last.sent:null;
+ const held=f.last?tr(`B giữ ${f.last.id}: phát ${f.last.sent.toFixed(2)} s, nhận ${f.last.received.toFixed(2)} s; tuổi từ lúc phát ${age.toFixed(2)} s.`,`B holds ${f.last.id}: sent ${f.last.sent.toFixed(2)} s, arrived ${f.last.received.toFixed(2)} s; age since sent ${age.toFixed(2)} s.`):tr('B chưa nhận tin nào.','B has no message yet.');
+ text('story-technical',`${evidence}. ${held}`);
+ const n=x=>Number(x.toFixed(2)).toString();
+ const movement=p=>p.y===0&&p.x>=0?tr(`${n(p.x)} mét theo chiều xe A chạy`,`${n(p.x)} metres in A’s direction of travel`):tr(`${n(p.x)} m theo trục X và ${n(p.y)} m theo trục Y`,`${n(p.x)} m along X and ${n(p.y)} m along Y`);
+ title=offset>0?tr(`A đang báo vị trí cách chỗ thật ${n(offset)} mét.`,`A reports a position ${n(offset)} metres from its true location.`):tr('A đang báo đúng vị trí trong mô phỏng này.','A reports its true position in this simulation.');
+ const change=d?tr(`Giữa hai lần gửi tin gần nhất, xe A đổi vị trí ${movement(d.physical)}. Vị trí được báo đổi ${movement(d.claimed)}.`,`Between the latest two transmissions, A moved ${movement(d.physical)}. Its reported position changed ${movement(d.claimed)}.`):tr('Chưa có hai lần gửi tin để so sánh xe đã đi thêm bao xa.','There are not yet two transmissions to compare movement.');
+ const received=f.last?tr(`B đang đọc tin được gửi ở giây ${n(f.last.sent)}. Bây giờ là giây ${n(time)}, nên thông tin đã cũ ${n(age)} giây. ${age===0?'Tin vừa được gửi và nhận ngay tại thời điểm này.':'Trong lúc chờ tin tiếp theo, B vẫn giữ vị trí trong tin này.'}`,`B is reading a message sent at second ${n(f.last.sent)}. It is now second ${n(time)}, so the information is ${n(age)} seconds old. ${age===0?'It was sent and received at this instant.':'Until another message arrives, B keeps this reported position.'}`):tr('B chưa nhận được tin, nên chưa có vị trí nào để ghi nhớ.','B has received no message and has no position to retain.');
+ const lesson=d&&!d.sameOffset?tr('Lúc bắt đầu hoặc ngừng báo lệch, vị trí được báo có thể nhảy. Đó là điều đang xảy ra ở cặp tin này.','When the offset starts or stops, the reported position can jump. This pair crosses such a change.'):offset>0?tr('Hãy tưởng tượng hai bạn đứng cách nhau 8 mét rồi cùng bước thêm 3 mét theo cùng một hướng. Hai bạn đi thêm bằng nhau nhưng vẫn ở hai chỗ khác nhau. Vì vậy, chỉ thấy các bước đi giống nhau chưa đủ để biết vị trí được báo là đúng.','Imagine two people 8 metres apart both moving 3 metres in the same direction. Equal steps do not put them in the same place. Matching changes alone cannot confirm the reported position.'):tr('Ở đây không có vị trí báo sai. Xe vẫn chạy giữa hai lần gửi tin, còn B chỉ có tin đã nhận. Chờ cập nhật không có nghĩa là hệ thống bị tấn công.','There is no false position here. The car moves between transmissions while B only has received messages. Waiting for an update does not mean an attack.');
+ $('story-insight').replaceChildren(...[[tr('Điều đang xảy ra','What is happening'),title],[tr('Xe đi thêm thế nào?','How did it move?'),change],[tr('B đang biết gì?','What does B know?'),received],[tr('Điều cần nhớ','Takeaway'),lesson]].map(([label,value])=>{const section=document.createElement('section'),h=document.createElement('strong'),p=document.createElement('p');h.textContent=label;p.textContent=value;section.append(h,p);return section;}));
  for(const b of document.querySelectorAll('[data-story]')){const [p,t]=storyStops[b.dataset.story];b.setAttribute('aria-pressed',String(selectedPreset===p&&time===t));}
 }
 function metricGroup(title,rows,note=''){
@@ -130,7 +134,13 @@ function createView(id,color){
  for(const [x,z] of [[100,7],[7,100]]){const road=new THREE.Mesh(new THREE.PlaneGeometry(x,z),roadMaterial);road.rotation.x=-Math.PI/2;road.position.y=.02;scene.add(road);}
  function box(c,wire=false){const mesh=new THREE.Mesh(new THREE.BoxGeometry(4,1.8,2.2),new THREE.MeshStandardMaterial({color:c,wireframe:wire}));mesh.position.y=1.1;scene.add(mesh);return mesh;}
  const isFocus=id==='focus';
- const main=isFocus?new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,.4,24),new THREE.MeshBasicMaterial({color})):box(color);if(isFocus)scene.add(main);
+ const main=isFocus?new THREE.Group():box(color);
+ if(isFocus){
+  const material=new THREE.MeshBasicMaterial({color});
+  const stem=new THREE.Mesh(new THREE.ConeGeometry(.65,1.8,20),material);stem.rotation.z=Math.PI;stem.position.y=.1;
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.85,20,12),material);head.position.y=1.4;
+  main.add(stem,head);scene.add(main);
+ }
  const observer=box(0x7eafff),reference=box(0x67e8c3,!isFocus);
  const claimMesh=isFocus?box(0xffc477,true):null;observer.rotation.y=Math.PI/2;
  function marker(label,color,radius,offset){
@@ -139,7 +149,7 @@ function createView(id,color){
   const tag=document.createElement('span');tag.className='position-tag';tag.textContent=label;tag.style.color='#'+color.toString(16).padStart(6,'0');target.appendChild(tag);
   return {ring,tag,offset};
  }
- const mainMark=marker(isFocus?'R':id==='truth'?'A':'A′',color,id==='truth'?2.8:3.5,isFocus?85:id==='truth'?-38:38);
+ const mainMark=marker(isFocus?tr('B đang nhớ','B remembers'):id==='truth'?'A':'A′',color,id==='truth'?2.8:3.5,isFocus?85:id==='truth'?-38:38);
  const referenceMark=marker('A',0x67e8c3,2.8,-38),observerMark=marker('B',0x7eafff,4.2,0);
  const claimMark=isFocus?marker('A′',0xffc477,4.8,60):null;
  const measureLine=isFocus?new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0xe2edf5})):null;if(measureLine)scene.add(measureLine);
@@ -197,8 +207,11 @@ function createView(id,color){
  reference.visible=Boolean(data.reference);if(data.reference)reference.position.set(data.reference.x,1.1,data.reference.y);
  observer.position.set(data.observer.x,1.1,data.observer.y);
  if(isFocus){
-  mainMark.tag.textContent=data.main?`R · ${tr('tuổi','age')} ${data.age.toFixed(2)} s`: 'R';
-  claimMesh.visible=Boolean(data.claim);if(data.claim)claimMesh.position.set(data.claim.x,1.1,data.claim.y);placeMark(claimMark,data.claim);
+  const showClaim=focusTopic==='offset';
+  const merged=showClaim&&data.main&&data.claim&&Math.hypot(data.main.x-data.claim.x,data.main.y-data.claim.y)<1e-6;
+  mainMark.tag.textContent=merged?tr('A′ · B đang nhớ cùng chỗ','A′ · B remembers this spot'):tr('B đang nhớ','B remembers');
+  claimMesh.visible=showClaim&&Boolean(data.claim);if(data.claim)claimMesh.position.set(data.claim.x,1.1,data.claim.y);
+  placeMark(claimMark,showClaim&&!merged?data.claim:null);
   measureLine.visible=Boolean(data.measure);if(data.measure){measureLine.geometry.dispose();measureLine.geometry=new THREE.BufferGeometry().setFromPoints([data.measure.from,data.measure.to].map(p=>new THREE.Vector3(p.x,.45,p.y)));}
  }
  placeMark(mainMark,p);placeMark(referenceMark,data.reference);placeMark(observerMark,data.observer);renderer.render(scene,camera);}
@@ -210,7 +223,8 @@ function draw(renderViews=true){
  const f=frame(config,time);observationGuide(f);storyInsight(f);drawCommunication(f);$('time').value=time;text('time-value',`${time.toFixed(2)} s`);text('play',playing?tr('Tạm dừng','Pause'):tr('Phát','Play'));
  const focused=focusData(f,{receiverOnly:$('focus-mode').value==='receiver',focus:focusTopic});
  text('focus-scope',$('focus-mode').value==='receiver'?tr('Chỉ B và bản tin đã tới; không dùng vị trí thật hay khai báo chưa nhận để căn camera.','Only B and arrived claims; framing excludes ground truth and unreceived claims.'):tr('Góc nhìn người phân tích — B không được cung cấp vị trí thật A. Đường nối chỉ đo khoảng cách, không phải đường xe chạy.','Analyst view — B is not supplied with true position A. The connector measures distance, not a driven route.'));
- text('focus-readout',`${focused.measure?`${focused.measure.label}: ${focused.measure.distance.toFixed(2)} m · `:''}${focused.main?`R: ${point(focused.main)} · ${focused.id} · ${tr('tuổi từ lúc phát','age since sent')} ${focused.age.toFixed(2)} s`:tr('Chưa có bản tin: chưa có dấu R.','No message yet: no R marker.')}`);
+ text('focus-readout',focused.main?tr(`Ghim tím: B đang nhớ A ở đây. Tin được gửi cách đây ${Number(focused.age.toFixed(2))} giây. Khi tin mới tới, ghim chuyển đến vị trí trong tin đó.`,`Purple pin: B remembers A here. The message was sent ${Number(focused.age.toFixed(2))} seconds ago. A new arrival moves the pin to the position in that message.`):tr('B chưa biết vị trí: chưa nhận được tin nên chưa có ghim tím.','B has no position yet: no message has arrived, so there is no purple pin.'));
+
  text('truth-value',`A: ${point(f.physical)}`);text('reported-value',`A′: ${point(f.claimed)}`);text('observed-value',f.last?`${point(f.last.claimed)} · ${tr('từ lúc phát','since sent')} ${(time-f.last.sent).toFixed(2)} s · ${tr('từ lúc nhận','since arrival')} ${f.age.toFixed(2)} s`:tr('Chưa nhận bản tin','No message received'));
  const rows=[[tr('Độ lệch hiện tại','Current offset'),active(config,time)?point({x:config.dx,y:config.dy}):point({x:0,y:0})],[tr('Vị trí xe B','Vehicle B position'),point(f.receiver)]];
  let note=tr('Cần hai bản tin phát để tính sai phân.','Two sent messages are needed for differences.');

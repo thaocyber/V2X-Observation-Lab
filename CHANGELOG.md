@@ -2,6 +2,9 @@
 
 ## Unreleased — 0.2.0 development
 
+- Vietnamese learning demo at `/learn/`: two worlds, identical messages, prediction/reveal, constrained lesson authoring and JSON exchange.
+- Beginner explanations, purple remembered-position pin and a separate fixed offset illustration.
+
 - Focused A/A′/R/B comparison, isolated receiver-only mode, on-marker data age and story-specific distance measurements; original panes available on demand.
 - Guided three-stop entry, nearby evidence and playback, collapsible advanced controls, and downloadable reproduction instructions.
 - One-way V2V flow and collapsible send/omit/receive log derived from the existing schedule. No model or export-schema change.
