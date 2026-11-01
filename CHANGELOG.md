@@ -1,5 +1,7 @@
 # Changelog
 
+- Added a model-derived 48-second illustrated demo, downloadable MP4, transcript and Watch → Learn → Explore navigation.
+
 ## Unreleased — 0.2.0 development
 
 - Standardized all three web workspaces, default lesson content, accessibility labels and validation messages on English. Imported/user-authored content is preserved.

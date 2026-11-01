@@ -5,6 +5,8 @@ import {presets} from './presets.mjs';
 import {viewData,focusData} from './view-data.mjs';
 import {communication} from './communication.mjs';
 const $=id=>document.getElementById(id);
+$('read-transcript').addEventListener('click',()=>{$('demo-transcript').open=true;});
+if(location.hash==='#demo-transcript')$('demo-transcript').open=true;
 let config={...presets.baseline},time=6.5,playing=false,lastTick=null,views=[],viewZoom=1,settleUntil=0,lastReadout=0;
 let selectedPreset='baseline',focusTopic='sampling';
 const point=p=>p?`(${p.x.toFixed(2)}, ${p.y.toFixed(2)}) m`:'—';

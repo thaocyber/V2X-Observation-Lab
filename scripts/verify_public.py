@@ -37,6 +37,12 @@ def inspect(files):
     for name in files:
         if name.startswith(('src/', 'experiments/', 'data/')):
             raise ValueError('Unexpected distribution directory: ' + name)
+        if name in {'web/media/observation-demo.mp4', 'web/media/observation-demo-poster.png'}:
+            data = (ROOT / name).read_bytes()
+            valid = data[4:8] == b'ftyp' if name.endswith('.mp4') else data.startswith(b'\x89PNG\r\n\x1a\n')
+            if not valid or len(data) > 12 * 1024 * 1024:
+                raise ValueError('Invalid or oversized reviewed demo media: ' + name)
+            continue
         text = (ROOT / name).read_text()
         for pattern in [r'/(?:home|Users)/', r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----', r'\bgh[pousr]_[A-Za-z0-9]{30,}', r'\bAKIA[0-9A-Z]{16}\b']:
             if re.search(pattern, text):
@@ -47,7 +53,7 @@ def inspect(files):
         def __init__(self):
             super().__init__(); self.links = []
         def handle_starttag(self, tag, attrs):
-            self.links.extend(value for key, value in attrs if key in {'src', 'href'} and value)
+            self.links.extend(value for key, value in attrs if key in {'src', 'href', 'poster'} and value)
     for name in files:
         path = ROOT / name
         refs = []
