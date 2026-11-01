@@ -1,4 +1,7 @@
-# v0.1.0 release checklist
+# Initial release record — v0.1.0
+
+Historical record. For current instructions, see the [maintainer guide](MAINTAINING.md)
+and [verification index](qa/README.md).
 
 ## Scope
 
@@ -38,4 +41,4 @@ device and rehearsal gates are listed in [BROWSER_QA.md](BROWSER_QA.md).
 
 Tag v0.1.0, prerelease notes, source archive, offline web bundle and SHA-256
 checksums. The JSON report's tool version identifies the source release.
-The Arsenal draft is not submitted; presenter information remains maintainer-owned.
+Conference submission status is managed separately from release verification.

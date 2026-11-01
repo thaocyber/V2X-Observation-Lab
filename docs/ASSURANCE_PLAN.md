@@ -16,7 +16,7 @@ invalid schemas and duplicate IDs fail; failed imports preserve current data;
 filters do not change aggregate metrics or full-data exports; imported strings
 render as text. Input limits: 2 MiB, 10,000 rows. No backend or new dependency.
 See [format](EVALUATION_FORMAT.md) and [QA](qa/evaluation-inspector-2026-11-01.md).
-The English interface is included in the publication update. Check the deployed revision before referencing public availability.
+The English Inspector is available at `/evaluate/`; see the [user guide](USER_GUIDE.md).
 
 ## Phase 2 — Reproduction and review workflow
 
@@ -26,7 +26,7 @@ when dataset membership, labels, positive class and evaluation policy agree.
 Acceptance: reopening a report preserves notes and reproduces calculations;
 incompatible comparisons are rejected with a reason. A hash does not authenticate
 an origin. Record code/version and input identity without claiming an audit-grade
-immutable history. Complete cross-browser/accessibility checks before submission; the UI is now English.
+immutable history. Expand cross-browser and accessibility checks before a stable release.
 
 ## Phase 3 — Link cases to observations
 
@@ -63,6 +63,7 @@ maintainer's instruction to commit/publish. Record the revision and deployment r
 Do not promise conference acceptance or use an unverified deadline as a release gate.
 
 Deferred: SHAP scores, trust heatmaps, live inference, model uploads, arbitrary attack
-libraries, RF injection, autonomous recommendations, PDF export and LMS/accounts.
+libraries, RF injection, autonomous recommendations, evaluation-report PDF export and LMS/accounts.
+The downloadable user-guide PDF is documentation, not an Inspector export.
 The existing learning roadmap remains the educational track; it is not replaced by
 an unimplemented general AI governance platform.

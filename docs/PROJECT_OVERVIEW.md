@@ -1,9 +1,6 @@
-# Arsenal proposal draft — not submitted
+# Project overview
 
-## Session title
-V2X Observation Lab: From AI Accuracy to Evidence-Based Assurance
-
-## Abstract
+## Purpose
 V2X security evaluations need more than an aggregate accuracy figure. Reviewers
 also need to know what information was available, which predictions failed, and
 what evidence is missing before drawing engineering conclusions.
@@ -46,13 +43,16 @@ boundaries; neither binary metrics nor translation invariance is claimed as nove
 4. Separate supplied facts, computed results, assumptions and unknowns.
 5. Export the evidence report and explain what further validation would be needed.
 
-These are two related workspaces, not a linked model-in-the-loop demonstration.
+This walkthrough uses Learning Lab and Evaluation Inspector. The separate
+Playground provides configurable observation scenarios.
 
-## Current development and access status
-The source includes all three English-language workspaces. The 2026-11-01
-publication update includes the Evaluation Inspector at `/evaluate/`. Before
-submission, verify the deployed revision and routes against this draft. This
-draft has not been submitted.
+## Development status
+
+The public MVP includes the Observation Playground, Learning Lab and Evaluation
+Inspector. The workspaces support complementary teaching and review activities;
+this is not an integrated model-in-the-loop system. Current usage instructions
+are in the [user guide](USER_GUIDE.md), with [verification records](qa/README.md)
+for the scope of completed checks.
 
 ## Limitations and roadmap
 Current Inspector input is labelled binary JSON with precomputed classes. There
@@ -63,13 +63,9 @@ Next steps: report reopening, compatible evaluation comparison, explicit case-to
 scenario adapters, structured human review and one separately planned public-data pilot.
 
 ## Links and setup
-- Existing public demo: https://v2x.tcybertrust.id.vn/
+- Public demo: https://v2x.tcybertrust.id.vn/
 - Source: https://github.com/thaocyber/V2X-Observation-Lab
 - Local run: serve `web/` with Python 3 HTTP server; open `/`, `/learn/`, `/evaluate/`.
 - Code license: MIT; retain the bundled Three.js notice.
 - Browser-local processing; after obtaining the files, no external API or account is required.
 
-## Maintainer items before submission
-Confirm the release revision, published Inspector access, browser QA,
-demo video, presenter information and the current event-specific form requirements.
-Do not claim acceptance, measured trustworthiness or deployment readiness.

@@ -6,6 +6,8 @@
 
 ## Unreleased — 0.2.0 development
 
+- Reorganized public documentation around users, data formats, maintenance and dated verification. Replaced conference application draft with a neutral project overview; simplified README.
+
 - Added English user documentation for all three workspaces, available as a web page, GitHub guide and four-page downloadable PDF.
 
 - Standardized all three web workspaces, default lesson content, accessibility labels and validation messages on English. Imported/user-authored content is preserved.

@@ -1,3 +1,9 @@
+# Historical browser QA log
+
+The entries below retain their original dates and tested scopes. For newer feature
+checks, see the [verification index](qa/README.md). Current English documentation
+is available in the [user guide](USER_GUIDE.md).
+
 # QA record — display updates, 2026-10-12
 
 Development build `0.2.0-dev`, following source commit `93b4ae1`. This section
