@@ -37,7 +37,7 @@ User-authored lessons and imported metadata retain their original language.
 ## Watch the overview
 
 The homepage includes a [48-second illustrated MP4](web/media/observation-demo.mp4),
-with English on-screen text, a poster and a transcript. It is generated from
+with synthetic US English female narration, English captions, on-screen text, a poster and a transcript. It is generated from
 `web/learn/model.mjs`, not a screen recording or an experiment result. It does not
 autoplay. The page guides visitors from the overview to Learning Lab, the
 playground and the separate Evaluation Inspector.
@@ -46,7 +46,13 @@ To rebuild the optional media assets, install Pillow and imageio-ffmpeg in a
 separate development environment, provide DejaVu Sans fonts and Node.js, then run
 `python scripts/build_demo.py`. These dependencies are not needed to use the site
 or run its standard verification. The video is H.264, 1280×720, 24 fps, 48 seconds,
-without audio; model time and video time differ as described in the transcript.
+with narration; model time and video time differ as described in the transcript.
+The renderer creates the silent base. To add narration, run
+`python scripts/add_narration.py --audio-dir /tmp/v2x-voice --synthesize`
+with edge-tts installed. This explicitly sends only the public text in
+`docs/demo-narration.json` to Microsoft’s speech service. Omit `--synthesize`
+to use four existing MP3 clips instead. Generated voice timing can vary; the
+script rejects clips that exceed their scene rather than cutting off speech.
 
 ## Run
 
