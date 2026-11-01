@@ -2,7 +2,12 @@
 
 ## Unreleased — 0.2.0 development
 
-- Vietnamese learning demo at `/learn/`: two worlds, identical messages, prediction/reveal, constrained lesson authoring and JSON exchange.
+- Standardized all three web workspaces, default lesson content, accessibility labels and validation messages on English. Imported/user-authored content is preserved.
+
+- Local Evaluation Inspector: validated binary JSON import, confusion metrics, filtered cases and evidence JSON with declared provenance, content hash and reviewer notes. No inference or assurance score.
+- Evidence-centered assurance plan and revised Arsenal proposal draft; Inspector included in the English publication update.
+
+- Learning demo at `/learn/`: two worlds, identical messages, prediction/reveal, constrained lesson authoring and JSON exchange.
 - Beginner explanations, purple remembered-position pin and a separate fixed offset illustration.
 
 - Focused A/A′/R/B comparison, isolated receiver-only mode, on-marker data age and story-specific distance measurements; original panes available on demand.

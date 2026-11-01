@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "v2x-binary-evaluation",
+  "metadata": {
+    "dataset": "Authored binary teaching fixture v1 \u2014 8 rows",
+    "model": "Fictional predictor \u2014 no model was executed",
+    "split": "Teaching fixture; not a train/validation/test experiment",
+    "intendedUse": "Learn to inspect confusion counts and evidence limitations",
+    "positiveClass": "1 = authored position-claim anomaly label; 0 = absence of that label",
+    "labelSource": "Hand-authored labels for a software demonstration, not measurements",
+    "thresholdPolicy": "Predictions supplied directly; no score or threshold is applied",
+    "dataOrigin": "synthetic"
+  },
+  "records": [
+    {
+      "id": "fixture-1",
+      "expected": 1,
+      "predicted": 1
+    },
+    {
+      "id": "fixture-2",
+      "expected": 1,
+      "predicted": 1
+    },
+    {
+      "id": "fixture-3",
+      "expected": 1,
+      "predicted": 0
+    },
+    {
+      "id": "fixture-4",
+      "expected": 1,
+      "predicted": 0
+    },
+    {
+      "id": "fixture-5",
+      "expected": 0,
+      "predicted": 0
+    },
+    {
+      "id": "fixture-6",
+      "expected": 0,
+      "predicted": 0
+    },
+    {
+      "id": "fixture-7",
+      "expected": 0,
+      "predicted": 0
+    },
+    {
+      "id": "fixture-8",
+      "expected": 0,
+      "predicted": 1
+    }
+  ]
+}

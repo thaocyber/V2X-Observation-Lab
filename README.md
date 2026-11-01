@@ -11,15 +11,28 @@ documented formulas. There are no learned model scores or measured traces.
 [Bug reports](https://github.com/thaocyber/V2X-Observation-Lab/issues/new/choose) ·
 [Private security reports](https://github.com/thaocyber/V2X-Observation-Lab/security/advisories/new)
 
+## Evidence-centered AI assurance track
+
+The source now includes an **Evaluation Inspector** at `/evaluate/`.
+Import precomputed binary predictions and reference labels, inspect errors and
+export a scoped evidence report. The included sample is fictional; no model is run.
+This supports review of evidence, not trust certification or a deployment decision.
+Serve the same `web/` directory to use all three workspaces.
+
+[Implementation plan](docs/ASSURANCE_PLAN.md) · [Input and report format](docs/EVALUATION_FORMAT.md).
+
 ## Learning demo
 
-[Create and try a lesson](https://v2x.tcybertrust.id.vn/learn/) (Vietnamese, demo 0.1).
+[Create and try a lesson](https://v2x.tcybertrust.id.vn/learn/) (English, demo 0.1).
 Compare two worlds with identical receiver messages, predict, then reveal their
 different true positions. Authors can change offset, speed, question and explanation,
 then share a validated lesson JSON. This is one constrained template, not a general
 scenario editor, detector, assessment platform or protocol implementation.
 
 [Step-by-step development plan](docs/LEARNING_ROADMAP.md).
+
+All bundled interface text, default examples and validation messages use English.
+User-authored lessons and imported metadata retain their original language.
 
 ## Run
 

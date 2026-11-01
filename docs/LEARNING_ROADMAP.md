@@ -3,15 +3,18 @@
 Status: learning demo 0.1, 2026-10-31. This is an incremental educational track;
 it does not declare the whole tool ready for v1.0 or validate a vehicle vulnerability.
 
+The broader evidence-review direction is in [ASSURANCE_PLAN.md](ASSURANCE_PLAN.md).
+Learning remains an educational entry point, not a substitute for model evaluation.
+
 ## 1. Working lesson loop — implemented
 
 Open [the learning demo](https://v2x.tcybertrust.id.vn/learn/), advance one second,
 choose an answer, then reveal true positions. The worlds have identical displayed
 messages but different true positions. Both use one shared coordinate scale.
 
-Choose **Soạn bài của bạn** to edit title, objective, question, explanation,
+Choose **Create your lesson** to edit title, objective, question, explanation,
 offset (2–16 m) and speed (1–5 m/s). Apply to restart the lesson. Download lesson
-JSON to keep it and use **Mở bài học** to reopen it. Reloading restores the default;
+JSON to keep it and use **Open lesson** to reopen it. Reloading restores the default;
 there is no automatic saving. Pending form changes are not exported.
 
 Lesson files use schemaVersion 1 and kind `v2x-two-worlds-lesson`. Unknown fields,
@@ -61,7 +64,7 @@ No private model, real traces, RF injection or collision claims are required.
 
 ## 6. Prepare a release candidate
 
-Translate the learning track into English; test keyboard, small screens and chosen
+The learning track now uses English; test keyboard, small screens and chosen
 browsers; provide a local/offline guide, example lesson files, regression checks,
 known limitations and a short demonstration video. Freeze and tag a release only
 once these checks and the learner feedback issues are resolved. Submission text
