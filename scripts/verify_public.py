@@ -43,6 +43,11 @@ def inspect(files):
             if not valid or len(data) > 12 * 1024 * 1024:
                 raise ValueError('Invalid or oversized reviewed demo media: ' + name)
             continue
+        if name == 'web/docs/v2x-observation-lab-guide.pdf':
+            data = (ROOT / name).read_bytes()
+            if not data.startswith(b'%PDF-') or len(data) > 2 * 1024 * 1024:
+                raise ValueError('Invalid or oversized reviewed user guide: ' + name)
+            continue
         text = (ROOT / name).read_text()
         for pattern in [r'/(?:home|Users)/', r'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----', r'\bgh[pousr]_[A-Za-z0-9]{30,}', r'\bAKIA[0-9A-Z]{16}\b']:
             if re.search(pattern, text):

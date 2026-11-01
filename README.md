@@ -7,9 +7,21 @@ documented formulas. There are no learned model scores or measured traces.
 ![Observation flow](docs/images/observation-flow.svg)
 
 [Live demo](https://v2x.tcybertrust.id.vn/) ·
+[Documentation](https://v2x.tcybertrust.id.vn/docs/) ·
 [Releases](https://github.com/thaocyber/V2X-Observation-Lab/releases) ·
 [Bug reports](https://github.com/thaocyber/V2X-Observation-Lab/issues/new/choose) ·
 [Private security reports](https://github.com/thaocyber/V2X-Observation-Lab/security/advisories/new)
+
+## User documentation
+
+Read the [English user guide](docs/USER_GUIDE.md) or download the
+[four-page PDF](web/docs/v2x-observation-lab-guide.pdf). It covers the MVP scope,
+installation, all three workspaces, examples, export formats and limitations.
+
+The web guide, Markdown and PDF share one content source. To rebuild them,
+install ReportLab and DejaVu Sans/Mono fonts in a development environment and run
+`python3 scripts/build_user_guide.py`. These dependencies are not needed to use
+the site or run its standard verification.
 
 ## Evidence-centered AI assurance track
 

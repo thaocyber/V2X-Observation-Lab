@@ -4,8 +4,8 @@
 
 Open the live site or start the offline bundle with `python3 -m http.server 8095
 --bind 127.0.0.1 --directory web` (one line). Use a WebGL-capable browser for 3D;
-coordinate and message tables remain the primary numerical evidence. Select
-English for an international audience. Keep a local source bundle available.
+coordinate and message tables remain the primary numerical evidence. The interface is in
+English. Keep a local source bundle available.
 
 ## 0:00–0:40 — The question
 

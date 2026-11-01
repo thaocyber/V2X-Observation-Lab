@@ -6,6 +6,8 @@
 
 ## Unreleased — 0.2.0 development
 
+- Added English user documentation for all three workspaces, available as a web page, GitHub guide and four-page downloadable PDF.
+
 - Standardized all three web workspaces, default lesson content, accessibility labels and validation messages on English. Imported/user-authored content is preserved.
 
 - Local Evaluation Inspector: validated binary JSON import, confusion metrics, filtered cases and evidence JSON with declared provenance, content hash and reviewer notes. No inference or assurance score.
